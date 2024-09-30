@@ -1,39 +1,122 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
 .App {
   text-align: center;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin: 10px 0;
-  padding: 10px;
-  border: 1px solid #ccc;
+  height: 100vh;
 }
 
-button {
-  background-color: #ff6b6b;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
+.home-container {
+  background-color: #f4f4f4;
+  padding: 50px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-button:hover {
-  background-color: #ff5252;
-}
-
-form {
+.content h1 {
+  font-size: 2.5rem;
+  color: #333;
   margin-bottom: 20px;
 }
 
-input {
-  margin-right: 10px;
-  padding: 5px;
-  border: 1px solid #ccc;
+.content p {
+  font-size: 1.2rem;
+  color: #555;
+  margin-bottom: 40px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Shared form styles (applies to both login and register forms) */
+.form-container {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  margin: 0 auto;
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-container input {
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.form-container button {
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.form-container button:hover {
+  background-color: #218838;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 20px;
+}
+
+.success-message {
+  color: green;
+  margin-bottom: 20px;
+}
+
+.map-container {
+  width: 80vw; /* 80% of the viewport width */
+  height: 60vh; /* 60% of the viewport height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Media query to adjust the map size for smaller screens */
+@media (max-width: 768px) {
+  .map-container {
+    width: 95vw; /* 95% of the viewport width for small screens */
+    height: 50vh; /* Adjust height to 50% for small screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    width: 100vw; /* Full width on very small screens */
+    height: 40vh; /* Reduce height for very small screens */
+  }
 }

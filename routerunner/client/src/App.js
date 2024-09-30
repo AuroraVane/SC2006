@@ -1,55 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ItemList from './components/ItemList';
-import AddItemForm from './components/AddItemForm';
 import './App.css';
+import { BrowserRouter as Router,Route,Routes } from 'react-router-dom';
+import HomePage from './components/HomePage';
+import LoginPage from './components/LoginForm';
+import NotFound from './components/NotFound';
+import Dashboard from './components/Dashboard';  
+import RegisterForm from './components/RegisterForm';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const App = () => {
-  const [items, setItems] = useState([]);
-
-  // Fetch items from the backend
-  useEffect(() => {
-    axios
-      .get('http://localhost:5000/api/items')
-      .then((response) => {
-        setItems(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching items:', error);
-      });
-  }, []);
-
-  // Add a new item
-  const addItem = (item) => {
-    axios
-      .post('http://localhost:5000/api/items', item)
-      .then((response) => {
-        setItems([...items, response.data]);
-      })
-      .catch((error) => {
-        console.error('Error adding item:', error);
-      });
-  };
-
-  // Delete an item
-  const deleteItem = (id) => {
-    axios
-      .delete(`http://localhost:5000/api/items/${id}`)
-      .then(() => {
-        setItems(items.filter((item) => item._id !== id));
-      })
-      .catch((error) => {
-        console.error('Error deleting item:', error);
-      });
-  };
-
   return (
-    <div className="App">
-      <h1>Item List</h1>
-      <AddItemForm addItem={addItem} />
-      <ItemList items={items} deleteItem={deleteItem} />
-    </div>
+    <Router>
+      <div className='App'>
+        <div className = "content">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path = "/login" element={<LoginPage />} />
+            <Route path = "*" element = {<NotFound />} />
+            <Route path = "/dashboard" element = {<Dashboard />} />
+            <Route path = "/register" element = {<RegisterForm />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
-};
+}
 
 export default App;
