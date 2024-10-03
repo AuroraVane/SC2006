@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const axios = require('axios');
 const jwt = require('jsonwebtoken'); // For token-based authentication (optional, can be added later)
 
 // Import the User model from external file
@@ -41,44 +42,6 @@ const Item = mongoose.model('Item', ItemSchema);
 // Root endpoint
 app.get('/', (req, res) => {
   res.send('Welcome to the MERN stack backend!');
-});
-
-// ==================== ITEMS ROUTES ====================
-
-// GET all items
-app.get('/api/items', async (req, res) => {
-  try {
-    const items = await Item.find();
-    res.json(items);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// POST a new item
-app.post('/api/items', async (req, res) => {
-  const newItem = new Item({
-    name: req.body.name,
-    price: req.body.price,
-  });
-
-  try {
-    await newItem.save();
-    res.status(201).json(newItem);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// DELETE an item by id
-app.delete('/api/items/:id', async (req, res) => {
-  try {
-    const deletedItem = await Item.findByIdAndDelete(req.params.id);
-    if (!deletedItem) return res.status(404).send('Item not found');
-    res.json(deletedItem);
-  } catch (error) {
-    res.status(500).send(error);
-  }
 });
 
 // ==================== USER AUTHENTICATION ====================
@@ -149,6 +112,30 @@ app.get('/api/users', async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+// ==================== END USER AUTHENTICATION ====================
+
+// ==================== API ENDPOINTS ====================
+
+// Endpoint to fetch carpark availability
+app.get('/api/carpark-availability', async (req, res) => {
+  try {
+    // Fetch data from the Data.gov.sg API
+    const response = await axios.get('https://api.data.gov.sg/v1/transport/carpark-availability');
+    
+    // Send the data to the frontend
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching carpark availability:', error);
+    res.status(500).send('Error fetching carpark data');
+  }
+});
+
+// Endpoint to get Google Maps API Key
+app.get('/api/google-maps-api-key', (req, res) => {
+  res.json({ key: process.env.GOOGLE_MAPS_API_KEY });
+});
+
 
 // Start the server
 app.listen(5000, () => {

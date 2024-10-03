@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, {useState,useEffect} from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 // Set up the default map style with a dynamic height and width
@@ -14,6 +14,21 @@ const defaultCenter = {
 };
 
 const GoogleMapComponent = () => {
+  const [apiKey, setApiKey] = useState('');
+
+  useEffect(() => {
+    // Fetch the API key from the backend
+    const fetchApiKey = async () => {
+      try {
+        const response = await axios.get('/api/maps-api-key');
+        setApiKey(response.data.apiKey);
+      } catch (error) {
+        console.error('Error fetching Google Maps API Key:', error);
+      }
+    };
+    fetchApiKey();
+  }, []);
+
   return (
     <div className="map-container">
       <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>

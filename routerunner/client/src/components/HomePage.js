@@ -1,13 +1,14 @@
 // components/HomePage.js
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import axios from 'axios';
 const HomePage = () => {
   const navigate = useNavigate();
 
   const handleLoginRedirect = () => {
     navigate('/login');
   };
+
 
   return (
     <div className="home-container">
@@ -18,6 +19,7 @@ const HomePage = () => {
                 
         </p>
         <button onClick={handleLoginRedirect}>Go to Login</button>
+        
       </div>
     </div>
   );
