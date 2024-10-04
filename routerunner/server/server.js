@@ -6,6 +6,10 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
 
+const csv = require('csv-parser');
+const fs = require('fs');
+
+
 const jwt = require('jsonwebtoken'); // For token-based authentication (optional, can be added later)
 const authenticateJWT = require('./authenticateJWT'); // Import the middleware function
 require('dotenv').config(); // Load environment variables from a .env file
@@ -19,6 +23,24 @@ const app = express();
 // Use middlewares
 app.use(bodyParser.json());
 app.use(cors());
+
+// Conversion to CSV
+let carparkData = [];
+
+// Function to parse the CSV file
+function parseCarparkCSV() {
+  fs.createReadStream('./HDB Carpark Information.csv')
+    .pipe(csv())
+    .on('data', (row) => {
+      carparkData.push(row);
+    })
+    .on('end', () => {
+      console.log('CSV file successfully processed');
+    });
+}
+
+// Call the function to parse the CSV on server start
+parseCarparkCSV();
 
 // Connect to MongoDB
 mongoose.connect('mongodb+srv://dbUser:JSepVm8RgvBby3E@cluster0.pejrter.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0', {
@@ -140,6 +162,16 @@ app.get('/api/carpark-availability', async (req, res) => {
   }
 });
 
+app.get('/api/hdbcarpark', async (req, res) => {
+  // Fetch data from the Data.gov.sg API
+  try {
+    // Send the carparkData as a response
+    res.json(carparkData);
+  } catch (error) {
+    console.error('Error sending carpark data:', error);
+    res.status(500).json({ error: 'Failed to send carpark data' });
+  }
+});
 // ==================== END API ENDPOINTS ====================
 
 // ==================== RunnerOperator ====================

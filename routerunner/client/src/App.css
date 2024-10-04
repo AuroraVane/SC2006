@@ -120,3 +120,75 @@ button:hover {
     height: 40vh; /* Reduce height for very small screens */
   }
 }
+
+#menu-toggle {
+  display: none; /* This will hide the checkbox */
+}
+
+/* Position the burger menu at the top-left */
+.burger-menu {
+  position: fixed;
+  top: 20px;  /* Adjust top position */
+  left: 20px; /* Adjust left position */
+  z-index: 1000;
+  display: inline-block;
+}
+
+/* Make the menu icon (three horizontal lines) bigger */
+.menu-icon {
+  width: 40px;  /* Increase width for a bigger icon */
+  height: 30px; /* Increase height for a bigger icon */
+  cursor: pointer;
+  display: block;
+}
+
+.menu-icon span {
+  background-color: #333;
+  display: block;
+  height: 5px;  /* Make the lines thicker */
+  width: 100%;
+  margin: 6px 0;  /* Increase space between the lines */
+}
+
+/* Style the dropdown menu */
+.menu {
+  display: none;
+  position: absolute;
+  top: 50px;  /* Position dropdown slightly lower */
+  left: 0;
+  background-color: #fff;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  width: 200px; /* Adjust width of the dropdown */
+  padding: 10px;
+}
+
+/* Show the menu when the checkbox is checked */
+#menu-toggle:checked + .menu-icon + .menu {
+  display: block;
+}
+
+.menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu ul li {
+  padding: 10px 0; /* Add padding between menu items */
+}
+
+.menu ul li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px; /* Increase font size */
+}
+
+.menu ul li button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  font-size: 16px; /* Increase font size */
+  padding: 0;
+}
