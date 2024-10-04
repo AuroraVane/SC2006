@@ -5,7 +5,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
+
 const jwt = require('jsonwebtoken'); // For token-based authentication (optional, can be added later)
+const authenticateJWT = require('./authenticateJWT'); // Import the middleware function
+require('dotenv').config(); // Load environment variables from a .env file
 
 // Import the User model from external file
 const User = require('./models/User');
@@ -78,7 +81,6 @@ app.post('/api/register', async (req, res) => {
 // POST: Login an existing user
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
-
   if (!username || !password) {
     return res.status(400).json({ message: 'Username and password are required' });
   }
@@ -96,15 +98,22 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid password' });
     }
 
-    // Return success response (you could add JWT here)
-    res.json({ message: 'Login successful', success: true });
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id, username: user.username, usertype: user.usertype }, // Payload (data stored in the token)
+      process.env.JWT_SECRET, // Secret key from .env
+      { expiresIn: '1h' } // Token expiration (1 hour in this case)
+    );
+
+    // Send the token back to the client
+    res.json({ token, message: 'Login successful' });
   } catch (error) {
     res.status(500).send('Error logging in');
   }
 });
 
 // GET all users (for testing purposes)
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', authenticateJWT, async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
@@ -122,7 +131,7 @@ app.get('/api/carpark-availability', async (req, res) => {
   try {
     // Fetch data from the Data.gov.sg API
     const response = await axios.get('https://api.data.gov.sg/v1/transport/carpark-availability');
-    
+
     // Send the data to the frontend
     res.json(response.data);
   } catch (error) {
@@ -131,11 +140,9 @@ app.get('/api/carpark-availability', async (req, res) => {
   }
 });
 
-// Endpoint to get Google Maps API Key
-app.get('/api/google-maps-api-key', (req, res) => {
-  res.json({ key: process.env.GOOGLE_MAPS_API_KEY });
-});
+// ==================== END API ENDPOINTS ====================
 
+// ==================== RunnerOperator ====================
 
 // Start the server
 app.listen(5000, () => {

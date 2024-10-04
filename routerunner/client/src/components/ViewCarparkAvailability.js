@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const CarparkAvailability = () => {
+const ViewCarparkAvailability = () => {
     const [carparkData, setCarparkData] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -32,4 +32,4 @@ const CarparkAvailability = () => {
   )
 };
 
-export default CarparkAvailability;
+export default ViewCarparkAvailability;

@@ -1,33 +1,18 @@
-
-import React, {useState,useEffect} from 'react';
+import React from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 // Set up the default map style with a dynamic height and width
 const mapStyles = {
   width: "100%", // Full width of the container
-  height: "100%", // Full height of the container
+  height: "500px", // Fixed height for the map
 };
 
 const defaultCenter = {
-  lat: 37.7749, // Latitude (San Francisco example)
-  lng: -122.4194 // Longitude (San Francisco example)
+  lat: 1.3418062891738656, // Latitude (San Francisco example)
+  lng: 103.81035747413657 // Longitude (San Francisco example)
 };
 
 const GoogleMapComponent = () => {
-  const [apiKey, setApiKey] = useState('');
-
-  useEffect(() => {
-    // Fetch the API key from the backend
-    const fetchApiKey = async () => {
-      try {
-        const response = await axios.get('/api/maps-api-key');
-        setApiKey(response.data.apiKey);
-      } catch (error) {
-        console.error('Error fetching Google Maps API Key:', error);
-      }
-    };
-    fetchApiKey();
-  }, []);
 
   return (
     <div className="map-container">
@@ -45,4 +30,3 @@ const GoogleMapComponent = () => {
 };
 
 export default GoogleMapComponent;
-

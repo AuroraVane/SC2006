@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import { parseJwt } from '../utils/jwtUtils';
 const LoginForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -21,14 +21,26 @@ const LoginForm = () => {
 
             // If login is successful
             console.log('Login successful:', response.data);
+            console.log('User type:', response.data.userType);
+            const token = response.data.token;
 
-            // Redirect based on login success
-            if (response.data.success) {
-                // Redirect to a dashboard or home page after successful login
-                navigate('/dashboard'); // Change this route to where you want the user to go
-            } else {
-                setErrorMessage('Invalid credentials');
+            if (token) {
+                // Store the token in local storage
+
+                localStorage.setItem('token', token);
+                const decodedToken = parseJwt(token);
+                const userType = decodedToken.usertype;
+
+                console.log('User type:', userType);
+                // Redirect based on login success
+                if (userType === 'operator'){
+                    navigate('/omm');
+                }
+                else if (userType === 'runner'){
+                    navigate('/rmm');
+                }
             }
+            // Redirect based on login success
         } catch (error) {
             // Handle error cases
             if (error.response && error.response.data.message) {
