@@ -14,8 +14,9 @@ const jwt = require('jsonwebtoken'); // For token-based authentication (optional
 const authenticateJWT = require('./authenticateJWT'); // Import the middleware function
 require('dotenv').config(); // Load environment variables from a .env file
 
-// Import the User model from external file
+// Import the Models from external file
 const User = require('./models/User');
+const Carpark = require('./models/Carpark');
 
 // Create an Express App
 const app = express();
@@ -24,29 +25,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Conversion to CSV
-let carparkData = [];
-
-// Function to parse the CSV file
-function parseCarparkCSV() {
-  fs.createReadStream('./HDB Carpark Information.csv')
-    .pipe(csv())
-    .on('data', (row) => {
-      carparkData.push(row);
-    })
-    .on('end', () => {
-      console.log('CSV file successfully processed');
-    });
-}
-
-// Call the function to parse the CSV on server start
-parseCarparkCSV();
-
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://dbUser:JSepVm8RgvBby3E@cluster0.pejrter.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect('mongodb+srv://dbUser:JSepVm8RgvBby3E@cluster0.pejrter.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0', {});
 
 // Verify connection
 const db = mongoose.connection;
@@ -54,15 +34,6 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
   console.log('Connected to MongoDB');
 });
-
-// Define the Item schema
-const ItemSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  price: { type: Number, required: true },
-});
-
-// Create the Item model
-const Item = mongoose.model('Item', ItemSchema);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -148,6 +119,34 @@ app.get('/api/users', authenticateJWT, async (req, res) => {
 
 // ==================== API ENDPOINTS ====================
 
+app.get('/api/carpark', async (req, res) => {
+  let { address } = req.query;
+
+  if (!address) {
+    return res.status(400).json({ message: 'Address query parameter is required' });
+  }
+
+  try {
+    // Decode the URL-encoded address back to its normal format
+    address = decodeURIComponent(address);  // Ensure decoding here
+    console.log('Decoded address:', address);
+
+    // Perform the query (either exact match or partial match depending on your use case)
+    const carpark = await Carpark.findOne({ address: { $regex: address, $options: 'i' } });
+
+    if (!carpark) {
+      return res.status(404).json({ message: 'Carpark not found' });
+    }
+
+    // Return the car_park_no
+    res.json({ car_park_no: carpark.car_park_no });
+  } catch (error) {
+    console.error('Error fetching carpark:', error);
+    res.status(500).json({ message: 'Error fetching carpark data' });
+  }
+});
+
+
 // Endpoint to fetch carpark availability
 app.get('/api/carpark-availability', async (req, res) => {
   try {
@@ -162,16 +161,6 @@ app.get('/api/carpark-availability', async (req, res) => {
   }
 });
 
-app.get('/api/hdbcarpark', async (req, res) => {
-  // Fetch data from the Data.gov.sg API
-  try {
-    // Send the carparkData as a response
-    res.json(carparkData);
-  } catch (error) {
-    console.error('Error sending carpark data:', error);
-    res.status(500).json({ error: 'Failed to send carpark data' });
-  }
-});
 // ==================== END API ENDPOINTS ====================
 
 // ==================== RunnerOperator ====================

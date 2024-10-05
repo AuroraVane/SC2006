@@ -3,88 +3,83 @@ import axios from 'axios';
 
 const ViewCarparkAvailability = () => {
     const [carparkData, setCarparkData] = useState(null);
-    const [carparkNumber, setCarparkNumber] = useState(''); // State to store the input carpark number
+    const [carparkAddress, setCarparkAddress] = useState(''); // State for input address
+    const [foundCarparkNumber, setFoundCarparkNumber] = useState(null); // Store the carpark number from /api/carpark
     const [selectedCarpark, setSelectedCarpark] = useState(null); // State to store the selected carpark's data
     const [loading, setLoading] = useState(false);
-    const [showAvailability, setShowAvailability] = useState(false); // Toggle for show/hide
 
-    // Fetch carpark data when the button is clicked
-    const fetchCarparkAvailability = async () => {
+    // Combined function to search carpark number by address and fetch availability
+    const searchAndFetchAvailability = async () => {
+        if (!carparkAddress) {
+            return; // If no address is provided, exit early
+        }
+    
         setLoading(true);
         try {
-            const response = await axios.get('/api/carpark-availability');
-            setCarparkData(response.data.items[0].carpark_data); // Access the nested carpark_data
-            console.log('Fetched Carpark Data:', response.data.items[0].carpark_data); // Log data to understand its structure
+            // Step 1: Fetch carpark number by address
+            const responseCarpark = await axios.get('/api/carpark', {
+                params: { address: carparkAddress }
+            });
+            const carparkNumber = responseCarpark.data.car_park_no; // Store the car_park_no
+            setFoundCarparkNumber(carparkNumber);
+            
+            // Step 2: Fetch carpark availability by carpark number
+            const responseAvailability = await axios.get('/api/carpark-availability');
+            const carparkData = responseAvailability.data.items[0].carpark_data;
+    
+            // Find the carpark availability for the fetched carpark number
+            const foundCarpark = carparkData.find(carpark => carpark.carpark_number.trim().toLowerCase() === carparkNumber.trim().toLowerCase());
+    
+            if (foundCarpark) {
+                setSelectedCarpark(foundCarpark); // Set the found carpark
+            } else {
+                setSelectedCarpark(null); // If not found, reset
+            }
         } catch (error) {
-            console.error('Error fetching carpark availability:', error);
+            setSelectedCarpark(null); // Reset if error occurs
         } finally {
-            setLoading(false);
+            setLoading(false); // Set loading to false after request is done
         }
-    };
-
-    // Handle search for a specific carpark by its number
-    const handleSearch = () => {
-        if (carparkData && Array.isArray(carparkData)) {
-            const foundCarpark = carparkData.find(carpark => carpark.carpark_number === carparkNumber);
-            console.log('Found Carpark:', foundCarpark); // Log the found carpark for debugging
-            setSelectedCarpark(foundCarpark || null); // Set the found carpark or null if not found
-        }
-    };
-
-    const handleToggleAvailability = async () => {
-        if (!carparkData) {
-            await fetchCarparkAvailability();
-        }
-        setShowAvailability(!showAvailability);
     };
 
     return (
         <div>
             <h1>Carpark Availability</h1>
 
-            {/* Input for Carpark Number */}
-            <div>
-                <label htmlFor="carparkNumber">Enter Carpark Number: </label>
+            {/* Input for Carpark Address */}
+            <div style={{ marginTop: '20px' }}>
+                <label htmlFor="carparkAddress">Enter Carpark Address: </label>
                 <input 
                     type="text" 
-                    id="carparkNumber" 
-                    value={carparkNumber} 
-                    onChange={(e) => setCarparkNumber(e.target.value)} 
+                    id="carparkAddress" 
+                    value={carparkAddress} 
+                    onChange={(e) => setCarparkAddress(e.target.value)} 
                 />
-                <button onClick={handleSearch}>Search</button>
+                <button onClick={searchAndFetchAvailability} disabled={loading}>
+                    {loading ? 'Loading...' : 'Search and Fetch Availability'}
+                </button>
             </div>
 
-            {/* Display the selected carpark's information */}
-            {selectedCarpark ? (
+            {/* Display the car_park_no result */}
+            {foundCarparkNumber && !loading && (
+                <div>
+                    <h3>Carpark Found</h3>
+                    <p>Carpark Number: {foundCarparkNumber}</p>
+                </div>
+            )}
+
+            {/* Display the selected carpark's availability or loading state */}
+            {loading ? (
+                <p>Loading...</p> 
+            ) : selectedCarpark ? (
                 <div>
                     <h3>Carpark Information</h3>
                     <p>Carpark Number: {selectedCarpark.carpark_number}</p>
                     <p>Last Updated: {selectedCarpark.update_datetime}</p>
                     <p>Capacity: {selectedCarpark.carpark_info?.[0]?.lots_available || 'N/A'}</p> {/* Accessing the first element in carpark_info for capacity */}
                 </div>
-            ) : carparkNumber && (
-                <p>No carpark found with number: {carparkNumber}</p>
-            )}
-
-            {/* Toggle button to show/hide carpark availability */}
-            <button onClick={handleToggleAvailability} disabled={loading}>
-                {loading ? 'Loading...' : showAvailability ? 'Hide Carpark Availability' : 'Show Carpark Availability'}
-            </button>
-
-            {/* Scrollable container for carpark data */}
-            {showAvailability && carparkData && Array.isArray(carparkData) && (
-                <div style={{ maxHeight: '400px', overflowY: 'scroll', border: '1px solid #ccc', padding: '10px', marginTop: '20px' }}>
-                    <h2>Carpark List</h2>
-                    <ul>
-                        {carparkData.map(carpark => (
-                            <li key={carpark.carpark_number}>
-                                <strong>Carpark Number:</strong> {carpark.carpark_number}, 
-                                <strong>Last Updated:</strong> {carpark.update_datetime}, 
-                                <strong>Capacity:</strong> {carpark.carpark_info?.[0]?.lots_available || 'N/A'}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+            ) : foundCarparkNumber && (
+                <p>No availability found for carpark number: {foundCarparkNumber}</p>
             )}
         </div>
     );
