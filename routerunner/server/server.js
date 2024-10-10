@@ -44,9 +44,9 @@ app.get('/', (req, res) => {
 
 // POST: Register a new user
 app.post('/api/register', async (req, res) => {
-  const { username, password, usertype } = req.body;
+  const { userID,username, password, usertype, email } = req.body;
 
-  if (!username || !password || !usertype) {
+  if (!username || !password || !usertype || !userID || !email) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -57,11 +57,25 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ message: 'Username already exists' });
     }
 
+    const existingUserID = await User.findOne({ userID });
+    if (existingUserID) {
+      return res.status(400).json({ message: 'UserID already exists' });
+    }
+
+    const existingemail = await User.findOne({ email });
+    if (existingemail) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+    const active = false;
     // Create and save the new user
+    
     const newUser = new User({
+      userID,
       username,
       password, // Password will be hashed in the pre-save hook defined in User model
       usertype,
+      email,
+      active,
     });
 
     await newUser.save();

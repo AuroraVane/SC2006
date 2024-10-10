@@ -3,9 +3,11 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const CreateNewRunner = () => {
+  const [userID, setUserID] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [usertype, setUsertype] = useState('');
+  const [email, setEmail] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
@@ -16,9 +18,11 @@ const CreateNewRunner = () => {
     try {
       // Send the registration request to the backend
       const response = await axios.post('http://localhost:5000/api/register', {
+        userID,
         username,
         password,
         usertype,
+        email,
       });
 
       // Handle success
@@ -44,6 +48,15 @@ const CreateNewRunner = () => {
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         <div>
+          <label>UserID:</label>
+          <input
+            type="text"
+            value={userID}
+            onChange={(e) => setUserID(e.target.value)}
+            required
+          />
+        </div>
+        <div>
           <label>Username:</label>
           <input
             type="text"
@@ -67,6 +80,15 @@ const CreateNewRunner = () => {
             type="text"
             value={usertype}
             onChange={(e) => setUsertype(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+        <label>Email:</label>
+          <input
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>

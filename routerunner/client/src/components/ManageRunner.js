@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const ManageRunner = () => {
+  const runnerID = '12345';
   return (
     <div>
       <h1>Manage Runner</h1>
@@ -10,7 +11,7 @@ const ManageRunner = () => {
       
       {/* Buttons to ViewRunner and CreateNewRunner */}
       <div>
-        <Link to="/viewrunner">
+        <Link to="/viewrunner/${runnerID}">
           <button>View Runner</button>
         </Link>
         <Link to="/createnewrunner">
