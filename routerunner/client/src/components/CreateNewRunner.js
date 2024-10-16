@@ -17,7 +17,7 @@ const CreateNewRunner = () => {
 
     try {
       // Send the registration request to the backend
-      const response = await axios.post('http://localhost:5000/api/register', {
+      const response = await axios.post('http://localhost:5001/api/register', {
         userID,
         username,
         password,

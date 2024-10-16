@@ -1,6 +1,6 @@
 const token = localStorage.getItem('token');
 
-axios.get('http://localhost:5000/api/protected-route', {
+axios.get('http://localhost:5001/api/protected-route', {
   headers: {
     Authorization: `Bearer ${token}`
   }

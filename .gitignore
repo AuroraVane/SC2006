@@ -1,2 +1,2 @@
-
-routerunner/client/src/components/GoogleMap.js
+./routerunner/client/node_modules
+./routerunner/server/node_modules
