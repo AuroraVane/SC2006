@@ -178,6 +178,15 @@ app.get('/api/carpark-availability', async (req, res) => {
 // ==================== END API ENDPOINTS ====================
 
 // ==================== RunnerOperator ====================
+app.get('/api/activerunner',async (req,res) => {
+  try {
+    const activeRunners = await User.find({usertype: 'runner', active: true});
+    res.json(activeRunners);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+}
+);
 
 // Start the server
 app.listen(5001, () => {

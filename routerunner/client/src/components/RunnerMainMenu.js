@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import CarparkAvailability from './ViewCarparkAvailability';
-import GoogleMapComponent from './GoogleMap';
 
 // Import FontAwesomeIcon and car icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,7 +14,6 @@ const RunnerBoard = () => {
 
     return (
         <div>
-            <GoogleMapComponent/>
             {/* Button with car icon */}
             <button 
                 onClick={handleCarparkClick} 
