@@ -1,48 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { GoogleMap, LoadScriptNext } from '@react-google-maps/api'; 
-import axios from 'axios'; // Ensure axios is imported
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import GoogleMapComponent from './GoogleMap';
 
-const mapStyles = {
-  width: "100vw",
-  height: "100vh",
-  position: "absolute",
-  top: 0,
-  left: 0,
-};
-
-const defaultCenter = {
-  lat: 1.3418062891738656,
-  lng: 103.81035747413657,
-};
-
-const Dashboard = () => {
-  const mapRef = useRef(null);
-  const [markers, setMarkers] = useState([]);
+const OperatorMainMenu = () => {
+  const mapRef = useRef(null); // Reference to the Google Map instance
   const [postalCode, setPostalCode] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeRunners, setActiveRunners] = useState([]); // State for active runners
+  const [activeRunners, setActiveRunners] = useState([]);
 
-  // Fetch active runners from the API when the component loads
+  // Fetch active runners from the backend
   useEffect(() => {
     const fetchActiveRunners = async () => {
       try {
         const response = await axios.get('/api/activerunner');
-        setActiveRunners(response.data); // Store active runners in state
+        setActiveRunners(response.data);
       } catch (error) {
         console.error('Error fetching active runners:', error);
       }
     };
 
     fetchActiveRunners();
-  }, []); // Empty dependency array means it runs once when the component mounts
+  }, []);
 
   const createMarker = (lat, lng) => {
     if (mapRef.current && window.google?.maps?.Marker) {
       const newMarker = new window.google.maps.Marker({
         position: { lat, lng },
-        map: mapRef.current,
+        map: mapRef.current, // Make sure we are passing the correct map instance
       });
-      setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
     } else {
       console.error("Google Maps Marker not available or map not loaded");
     }
@@ -83,51 +68,28 @@ const Dashboard = () => {
     setIsModalOpen(!isModalOpen);
   };
 
-  const addButtonToMap = (map) => {
-    const buttonDiv = document.createElement('div');
-    buttonDiv.innerHTML = '<button>Add Marker by Postal Code</button>';
-    buttonDiv.style.margin = '10px';
-    buttonDiv.style.padding = '5px';
-    buttonDiv.style.backgroundColor = '#fff';
-    buttonDiv.style.border = '2px solid #000';
-    buttonDiv.style.borderRadius = '4px';
-    buttonDiv.style.cursor = 'pointer';
-
-    buttonDiv.addEventListener('click', toggleModal);
-
-    map.controls[window.google.maps.ControlPosition.TOP_CENTER].push(buttonDiv);
-  };
-
   return (
-    <div className="map-container" style={{ height: '100vh', width: '100vw', position: 'relative' }}>
-      <LoadScriptNext googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
-        <GoogleMap
-          mapContainerStyle={mapStyles}
-          zoom={13}
-          center={defaultCenter}
-          options={{
-            mapTypeControl: false,
-            zoomControl: false,
-            fullscreenControl: false,
-            streetViewControl: false,
-          }}
-          onLoad={(map) => {
-            mapRef.current = map;
-            addButtonToMap(map);
-          }}
-        />
-      </LoadScriptNext>
+    <div style={{ position: 'relative', height: '100vh' }}>
+      {/* Render the Google Map Component and pass the map reference */}
+      <GoogleMapComponent mapRef={mapRef} />
 
-      {/* Active Runner List at the bottom */}
-      <div className="active-runner-container">
-        <h3>Active Runner</h3>
-        <div className="runner-list">
-          {activeRunners.map((runner, index) => (
-            <div key={index} className="runner-item">
-              <span>{runner.username} </span>
-            </div>
-          ))}
-        </div>
+      {/* Button to open modal for adding marker */}
+      <div style={{
+        position: 'absolute',
+        top: '10px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1,
+      }}>
+        <button onClick={toggleModal} style={{
+          padding: '10px',
+          backgroundColor: '#fff',
+          border: '2px solid #000',
+          borderRadius: '4px',
+          cursor: 'pointer'
+        }}>
+          Add Marker by Postal Code
+        </button>
       </div>
 
       {isModalOpen && (
@@ -151,6 +113,35 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Active Runners Container */}
+      <div style={{
+        position: 'absolute',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        backgroundColor: '#f0f0f0',
+        borderRadius: '10px',
+        padding: '10px',
+        width: '300px',
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+        textAlign: 'center',
+      }}>
+        <h3>Active Runners</h3>
+        <ul style={{ listStyleType: 'none', padding: 0 }}>
+          {activeRunners.map((runner, index) => (
+            <li key={runner._id} style={{
+              margin: '10px 0',
+              padding: '10px',
+              backgroundColor: '#fff',
+              borderRadius: '5px',
+              boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
+            }}>
+              {index + 1}: {runner.username} ({runner.email})
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <style jsx="true">{`
         .modal {
@@ -182,38 +173,9 @@ const Dashboard = () => {
           cursor: pointer;
           font-size: 20px;
         }
-
-        /* Active Runner Box Styles */
-        .active-runner-container {
-          position: absolute;
-          bottom: 10px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 90%;
-          background-color: #f8f8f8;
-          border: 2px solid #ccc;
-          border-radius: 12px;
-          padding: 10px;
-          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .runner-list {
-          max-height: 150px;
-          overflow-y: auto;
-        }
-
-        .runner-item {
-          background-color: #ffffff;
-          margin: 5px 0;
-          padding: 10px;
-          border-radius: 8px;
-          box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-          display: flex;
-          justify-content: space-between;
-        }
       `}</style>
     </div>
   );
 };
 
-export default Dashboard;
+export default OperatorMainMenu;

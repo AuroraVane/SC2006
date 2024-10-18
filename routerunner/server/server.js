@@ -178,15 +178,16 @@ app.get('/api/carpark-availability', async (req, res) => {
 // ==================== END API ENDPOINTS ====================
 
 // ==================== RunnerOperator ====================
-app.get('/api/activerunner',async (req,res) => {
+app.get('/api/activerunner', async (req, res) => {
   try {
-    const activeRunners = await User.find({usertype: 'runner', active: true});
+    // Assuming you have a User schema where active runners are marked as active
+    const activeRunners = await User.find({ usertype: 'runner', active: true });
     res.json(activeRunners);
   } catch (error) {
-    res.status(500).send(error);
+    console.error('Error fetching active runners:', error);
+    res.status(500).json({ message: 'Error fetching active runners' });
   }
-}
-);
+});
 
 // Start the server
 app.listen(5001, () => {
