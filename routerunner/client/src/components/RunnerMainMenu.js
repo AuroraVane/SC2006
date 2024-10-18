@@ -1,12 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import CarparkAvailability from './ViewCarparkAvailability';
 import GoogleMapComponent from './GoogleMap';
+import { parseJwt } from '../utils/jwtUtils';
 
 // Import FontAwesomeIcon and car icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCar } from '@fortawesome/free-solid-svg-icons';
 
 const RunnerBoard = () => {
+    const mapRef = useRef(null);
+    const token = localStorage.getItem('token');
+    const decodedtoken = token ? parseJwt(token) : null;
+    const [lastLocation, setLastLocation] = useState('');
+    const lastlocation = decodedtoken?.lastlocation;
+    
+    const geocodePostalCode = async (postalCode) => {
+        try {
+          const geocoder = new window.google.maps.Geocoder();
+          const response = await geocoder.geocode({ address: postalCode });
+          if (response.results[0]) {
+            const location = response.results[0].geometry.location;
+            return {
+              lat: location.lat(),
+              lng: location.lng(),
+            };
+          }
+        } catch (error) {
+          console.error('Error with Geocoding:', error);
+        }
+        return null;
+      };
+
+    const createMarker = (lat, lng) => {
+        if (mapRef.current && window.google?.maps?.Marker) {
+          const newMarker = new window.google.maps.Marker({
+            position: { lat, lng },
+            map: mapRef.current, // Make sure we are passing the correct map instance
+          });
+        } else {
+          console.error("Google Maps Marker not available or map not loaded");
+        }
+      };
     const [showCarpark, setShowCarpark] = useState(false); // State to show/hide carpark data
 
     const handleCarparkClick = () => {
@@ -16,10 +50,20 @@ const RunnerBoard = () => {
     const closeModal = () => {
         setShowCarpark(false); // Close the carpark modal
     };
-
+    useEffect(() => {
+        if (lastlocation) {
+            geocodePostalCode(lastlocation).then((location) => { // Use lastlocation here
+                if (location) {
+                    createMarker(location.lat, location.lng); // Drop the marker
+                }
+            }).catch((error) => {
+                console.error('Error geocoding postal code:', error);
+            });
+        }
+    }, [lastlocation]);
     return (
         <div>
-            <GoogleMapComponent />
+            <GoogleMapComponent mapRef={mapRef}/>
             {/* Button with car icon styled like the example */}
             <div style={{
                 position: 'absolute',

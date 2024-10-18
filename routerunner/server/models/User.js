@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   usertype: { type: String, required: true },
   password: { type: String, required: true },
   active: { type: Boolean, default: false },
+  lastlocation: { type: String, default: '' }, // Format Postal Code
 });
 
 // Hash the password before saving the user to the database

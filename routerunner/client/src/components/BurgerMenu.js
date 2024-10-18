@@ -11,7 +11,7 @@ const BurgerMenu = () => {
   const token = localStorage.getItem('token');
   const decodedtoken = token ? parseJwt(token) : null;
   const usertype = decodedtoken?.usertype;
-
+  const username = decodedtoken?.username;
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login'); // Redirect to login after logout
@@ -29,7 +29,7 @@ const BurgerMenu = () => {
         <ul>
           {usertype === 'operator' && (
             <>
-              <li><Link to="/omm">Home</Link></li>
+              <li><Link to={`/omm/${username}`}>Home</Link></li>
               <li><Link to="/mngjob">Manage Jobs</Link></li>
               <li><Link to="/mngrnr">Manage Runner</Link></li>
               <li><button onClick={handleLogout}>Logout</button></li>
@@ -37,7 +37,7 @@ const BurgerMenu = () => {
           )}
           {usertype === 'runner' && (
             <>
-              <li><Link to="/rmm">Home</Link></li>
+              <li><Link to={`/rmm/${username}`}>Home</Link></li>
               <li><Link to="/viewjobs">View Jobs</Link></li>
               <li><button onClick={handleLogout}>Logout</button></li>
             </>

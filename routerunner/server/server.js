@@ -67,6 +67,7 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ message: 'Email already exists' });
     }
     const active = false;
+    const postalCode = '';
     // Create and save the new user
     
     const newUser = new User({
@@ -76,6 +77,7 @@ app.post('/api/register', async (req, res) => {
       usertype,
       email,
       active,
+      postalCode,
     });
 
     await newUser.save();
@@ -107,7 +109,7 @@ app.post('/api/login', async (req, res) => {
 
     // Create JWT token
     const token = jwt.sign(
-      { userId: user._id, username: user.username, usertype: user.usertype }, // Payload (data stored in the token)
+      { userId: user._id, username: user.username, usertype: user.usertype, lastlocation: user.lastlocation }, // Payload (data stored in the token)
       process.env.JWT_SECRET, // Secret key from .env
       { expiresIn: '1h' } // Token expiration (1 hour in this case)
     );
@@ -186,6 +188,21 @@ app.get('/api/activerunner', async (req, res) => {
   } catch (error) {
     console.error('Error fetching active runners:', error);
     res.status(500).json({ message: 'Error fetching active runners' });
+  }
+});
+
+app.get('/api/user/lastlocation', async (req,res) => {
+  try {
+    // Get the user's username from the token
+    const { username } = req.user;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ postalCode: user.lastlocation, username });
+  } catch (error) {
+    console.error('Error fetching user location:', error);
+    res.status(500).json({ message: 'Error fetching user location' });
   }
 });
 
