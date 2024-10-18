@@ -35,7 +35,7 @@ const App = () => {
             <Route path="/viewjobdetails/:jobID" element={<ViewJobDetails />} />
 
             {/* Operator Routes */}
-            <Route path="/omm" element={<ProtectedRoute element={OperatorMainMenu} allowedUsertype="operator" />} />
+            <Route path="/omm/:userID" element={<ProtectedRoute element={OperatorMainMenu} allowedUsertype="operator" />} />
             <Route path="/mngjob" element={<ProtectedRoute element={ManageJobs} allowedUsertype="operator" />} />
             <Route path="/mngrnr" element={<ProtectedRoute element={ManageRunner} allowedUsertype="operator" />} />
             <Route path="/createnewrunner" element={<ProtectedRoute element={CreateNewRunner} allowedUsertype="operator" />} />
@@ -44,7 +44,7 @@ const App = () => {
             <Route path="/historylogs" element={<ProtectedRoute element={HistoryLogs} allowedUsertype="operator" />} />
 
             {/* Runner Routes */}
-            <Route path="/rmm" element={<ProtectedRoute element={RunnerMainMenu} allowedUsertype="runner" />} />
+            <Route path="/rmm/:userID" element={<ProtectedRoute element={RunnerMainMenu} allowedUsertype="runner" />} />
             <Route path="/viewcarpark" element={<ProtectedRoute element={ViewCarparkAvailability} allowedUsertype="runner" />} />
             <Route path="/viewjobs" element={<ProtectedRoute element={ViewJobs} allowedUsertype="runner" />} />
           </Route>

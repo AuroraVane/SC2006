@@ -34,10 +34,10 @@ const LoginForm = () => {
                 console.log('User type:', userType);
                 // Redirect based on login success
                 if (userType === 'operator'){
-                    navigate('/omm');
+                    navigate(`/omm/${username}`);
                 }
                 else if (userType === 'runner'){
-                    navigate('/rmm');
+                    navigate(`/rmm/${username}`);
                 }
             }
             // Redirect based on login success
