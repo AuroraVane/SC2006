@@ -44,46 +44,60 @@ app.get('/', (req, res) => {
 
 // POST: Register a new user
 app.post('/api/register', async (req, res) => {
-  const { userID,username, password, usertype, email } = req.body;
+  const { username, password, email, usertype } = req.body;
 
-  if (!username || !password || !usertype || !userID || !email) {
-    return res.status(400).json({ message: 'All fields are required' });
+  // Initialize an array to hold error messages
+  const errors = [];
+
+  // Validate email format using a regular expression
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    errors.push('Enter a valid email address');
+  }
+
+  // Validate password requirements
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
+  if (!passwordRegex.test(password)) {
+    errors.push('Password must be at least 10 characters long, contain upper and lower case letters, and at least one special character.');
+  }
+
+  // Check if the user already exists
+  const existingUser = await User.findOne({ username });
+  if (existingUser) {
+    errors.push('Username already exists');
+  }
+
+  const existingEmail = await User.findOne({ email });
+  if (existingEmail) {
+    errors.push('Email already exists');
+  }
+
+  // If there are any errors, return them
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
   }
 
   try {
-    // Check if the user already exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Username already exists' });
-    }
+    // Automatically generate userID
+    const lastUser = await User.findOne().sort({ userID: -1 });
+    const newUserID = lastUser ? lastUser.userID + 1 : 1; // Start from 1 if no user exists
 
-    const existingUserID = await User.findOne({ userID });
-    if (existingUserID) {
-      return res.status(400).json({ message: 'UserID already exists' });
-    }
-
-    const existingemail = await User.findOne({ email });
-    if (existingemail) {
-      return res.status(400).json({ message: 'Email already exists' });
-    }
-    const active = false;
-    const postalCode = '';
-    // Create and save the new user
-    
     const newUser = new User({
-      userID,
+      userID: newUserID,
       username,
-      password, // Password will be hashed in the pre-save hook defined in User model
+      password, // Ensure to hash the password before saving it
       usertype,
       email,
-      active,
-      postalCode,
+      active: false,
+      postalCode: '',
     });
 
     await newUser.save();
-    res.status(201).json({ message: 'User registered successfully' });
+    return res.status(201).json({ message: 'User registered successfully' });
+
   } catch (error) {
-    res.status(500).send('Error registering user');
+    console.error('Error registering user:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 });
 
