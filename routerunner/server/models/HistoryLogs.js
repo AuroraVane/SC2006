@@ -4,10 +4,12 @@ const mongoose = require('mongoose');
 const historylogsSchema = new mongoose.Schema({
   job : {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Job'
+    ref: 'Job',
+    required: true,
+    unique: false,
   },
-  date : String,
-});
+  date : {type: String, required: true, unique: false,}
+},{collection:"historyLogs"});
 
-// Export the Carpark model
+// Export the HistoryLogs model
 module.exports = mongoose.model('Historylogs', historylogsSchema);

@@ -177,6 +177,73 @@ app.get('/api/carpark-availability', async (req, res) => {
   }
 });
 
+// ==================== HISTORY LOGS ENDPOINT ====================
+
+// Import the HistoryLogs model
+const HistoryLogs = require('./models/HistoryLogs');
+
+// API route to fetch history logs
+app.get('/api/historylogs', async (req, res) => {
+  try {
+    // Find all history logs and populate related fields
+    const logs = await HistoryLogs.find()
+      .populate('job')  // Populating the 'job' field with associated job details
+      .exec();
+
+    // Send the logs as JSON
+    res.json(logs);
+  } catch (error) {
+    console.error('Error fetching history logs:', error);
+    res.status(500).send('Error fetching history logs');
+  }
+});
+
+
+// ==================== END API ENDPOINTS ====================
+
+
+// ==================== JOB CREATION ENDPOINT ====================
+
+// Import the Job model
+const Job = require('./models/Job');
+const Address = require('./models/Address');
+
+app.post('/api/jobs', async (req, res) => {
+  const { jobID, address, runner, note, priority, status } = req.body;
+
+  // Validate required fields
+  if (!jobID || !address || typeof status !== 'boolean') {
+      return res.status(400).json({ message: 'jobID, startAddress, and status are required.' });
+  }
+  try { 
+    const newAddress = new Address({
+      street: address.street,
+      block: address.block,
+      unitNumber: address.unitNumber,
+      postalCode: address.postalCode,
+    });
+    console.log(newAddress);
+    await newAddress.save();
+    
+    console.log({ message: 'Address created successfully', job: newAddress})
+    const newJob = new Job({
+          jobID: jobID,
+          address: newAddress._id, // Handle if endAddress is provided
+          priority: priority || false,
+          note: note || null,
+          runner: runner || null, // Handle if runner is provided
+          status: status,
+    });
+
+    await newJob.save();
+    console.log("Successful")
+    res.status(201).json({ message: 'Job created successfully', job: newJob });
+  } catch (error) {
+      console.error('Error creating job:', error);
+      res.status(500).json({ message: 'Error creating job', error: error.message });
+  }
+});
+
 // ==================== END API ENDPOINTS ====================
 
 // ==================== RunnerOperator ====================
