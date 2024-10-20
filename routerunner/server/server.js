@@ -205,6 +205,17 @@ app.get('/api/activerunner', async (req, res) => {
   }
 });
 
+app.get('/api/runners', async (req, res) => {
+  try {
+    // Fetch all runners, regardless of their active status
+    const allRunners = await User.find({ usertype: 'runner' });
+    res.json(allRunners);
+  } catch (error) {
+    console.error('Error fetching all runners:', error);
+    res.status(500).json({ message: 'Error fetching all runners' });
+  }
+});
+
 app.get('/api/user/lastlocation', async (req,res) => {
   try {
     // Get the user's username from the token

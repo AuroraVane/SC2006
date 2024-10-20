@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Import Link here
 
 const CreateNewRunner = () => {
   const [username, setUsername] = useState('');
@@ -119,10 +119,16 @@ const CreateNewRunner = () => {
         )}
 
         <button type="submit">Register</button>
+
+        {/* Back to Manage Runners Button */}
+        <Link to="/mngrnr">
+          <button className="back-button" style={{ marginTop: '25px', fontSize: '12px', padding: '5px 10px' }}>Back to Manage Runners</button>
+        </Link>
       </form>
     </div>
   );
 };
 
 export default CreateNewRunner;
+
 

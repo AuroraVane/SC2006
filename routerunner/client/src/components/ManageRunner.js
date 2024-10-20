@@ -1,24 +1,25 @@
 // components/ManageRunners.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-// Sample data for runners (replace this with actual data fetching)
-const sampleRunners = [
-  { id: '1', username: 'runner1', active: true },
-  { id: '2', username: 'runner2', active: false },
-  { id: '3', username: 'runner3', active: true },
-  { id: '4', username: 'runner4', active: false },
-  { id: '5', username: 'runner5', active: true },
-  { id: '6', username: 'runner6', active: false },
-  { id: '7', username: 'runner7', active: true },
-  { id: '8', username: 'runner8', active: false },
-  { id: '9', username: 'runner9', active: true },
-  { id: '10', username: 'runner10', active: false },
-];
+import axios from 'axios';
 
 const ManageRunner = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [runners, setRunners] = useState(sampleRunners);
+  const [runners, setRunners] = useState([]);
+
+  // Fetch all runners from API on component mount
+  useEffect(() => {
+    const fetchAllRunners = async () => {
+      try {
+        const response = await axios.get('/api/runners'); // Ensure this endpoint returns all runners
+        setRunners(response.data); // Update runners with fetched data
+      } catch (error) {
+        console.error('Error fetching runners:', error);
+      }
+    };
+
+    fetchAllRunners();
+  }, []);
 
   // Filter runners based on search term
   const filteredRunners = runners.filter(runner =>
