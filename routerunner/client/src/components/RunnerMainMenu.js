@@ -1,69 +1,125 @@
-import React, { useState,useRef,useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import CarparkAvailability from './ViewCarparkAvailability';
 import GoogleMapComponent from './GoogleMap';
 import { parseJwt } from '../utils/jwtUtils';
-
-// Import FontAwesomeIcon and car icon
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCar } from '@fortawesome/free-solid-svg-icons';
 
 const RunnerBoard = () => {
     const mapRef = useRef(null);
+    const directionsRendererRef = useRef(null); // For route rendering
     const token = localStorage.getItem('token');
     const decodedtoken = token ? parseJwt(token) : null;
     const [lastLocation, setLastLocation] = useState('');
     const lastlocation = decodedtoken?.lastlocation;
-    
-    const geocodePostalCode = async (postalCode) => {
-        try {
-          const geocoder = new window.google.maps.Geocoder();
-          const response = await geocoder.geocode({ address: postalCode });
-          if (response.results[0]) {
-            const location = response.results[0].geometry.location;
-            return {
-              lat: location.lat(),
-              lng: location.lng(),
-            };
-          }
-        } catch (error) {
-          console.error('Error with Geocoding:', error);
-        }
-        return null;
-      };
-
-    const createMarker = (lat, lng) => {
-        if (mapRef.current && window.google?.maps?.Marker) {
-          const newMarker = new window.google.maps.Marker({
-            position: { lat, lng },
-            map: mapRef.current, // Make sure we are passing the correct map instance
-          });
-        } else {
-          console.error("Google Maps Marker not available or map not loaded");
-        }
-      };
+    const [newlocation, setnewLocation] = useState('');
     const [showCarpark, setShowCarpark] = useState(false); // State to show/hide carpark data
 
+    // Function to handle carpark button click
     const handleCarparkClick = () => {
-        setShowCarpark(!showCarpark); // Toggle the carpark availability display
+        setShowCarpark(!showCarpark); // Toggle the carpark modal visibility
     };
 
+    // Function to close the carpark modal
     const closeModal = () => {
-        setShowCarpark(false); // Close the carpark modal
+        setShowCarpark(false); // Set the modal visibility to false
     };
-    useEffect(() => {
-        if (lastlocation) {
-            geocodePostalCode(lastlocation).then((location) => { // Use lastlocation here
-                if (location) {
-                    createMarker(location.lat, location.lng); // Drop the marker
-                }
-            }).catch((error) => {
-                console.error('Error geocoding postal code:', error);
-            });
+
+    // Geocoding function
+    const geocodePostalCode = async (postalCode) => {
+        try {
+            const geocoder = new window.google.maps.Geocoder();
+            const response = await geocoder.geocode({ address: postalCode });
+            if (response.results[0]) {
+                const location = response.results[0].geometry.location;
+                return {
+                    lat: location.lat(),
+                    lng: location.lng(),
+                };
+            }
+        } catch (error) {
+            console.error('Error with Geocoding:', error);
         }
-    }, [lastlocation]);
+        return null;
+    };
+
+    // Function to create markers on the map
+    const createMarker = (lat, lng) => {
+        if (mapRef.current && window.google?.maps?.Marker) {
+            new window.google.maps.Marker({
+                position: { lat, lng },
+                map: mapRef.current,
+            });
+        } else {
+            console.error('Google Maps Marker not available or map not loaded');
+        }
+    };
+
+    // Function to display the route
+    const displayRoute = (start, end) => {
+        if (window.google?.maps?.DirectionsService && window.google?.maps?.DirectionsRenderer) {
+            const directionsService = new window.google.maps.DirectionsService();
+            if (!directionsRendererRef.current) {
+                directionsRendererRef.current = new window.google.maps.DirectionsRenderer();
+                directionsRendererRef.current.setMap(mapRef.current);
+            }
+
+            directionsService.route(
+                {
+                    origin: start,
+                    destination: end,
+                    travelMode: window.google.maps.TravelMode.DRIVING, // Set the travel mode (Driving, Walking, etc.)
+                },
+                (result, status) => {
+                    if (status === 'OK') {
+                        directionsRendererRef.current.setDirections(result);
+                    } else {
+                        console.error('Error fetching directions:', status);
+                    }
+                }
+            );
+        } else {
+            console.error('Google Maps Directions Service not available');
+        }
+    };
+
+    useEffect(() => {
+        // Fetch new location once the component is mounted
+        const fetchNewLocation = async () => {
+            try {
+                const response = await axios.get('/api/user/newUserLocation');
+                setnewLocation(response.data.newlocation); // This will trigger re-render
+            } catch (error) {
+                console.error('Error fetching active runners:', error);
+            }
+        };
+        fetchNewLocation(); // Start fetching new location
+    }, []); // Empty dependency array ensures this runs once on mount
+
+    useEffect(() => {
+        const handleRouting = async () => {
+            if (lastlocation && newlocation) {
+                // Geocode the last location and new location
+                const lastLoc = await geocodePostalCode(lastlocation);
+                const newLoc = await geocodePostalCode(newlocation);
+
+                if (lastLoc && newLoc) {
+                    createMarker(lastLoc.lat, lastLoc.lng); // Drop marker for last location
+                    createMarker(newLoc.lat, newLoc.lng);   // Drop marker for new location
+
+                    // Display the route
+                    displayRoute(lastLoc, newLoc);
+                }
+            }
+        };
+
+        handleRouting(); // Call the routing logic after locations are available
+    }, [lastlocation, newlocation]); // Trigger when lastlocation or newlocation changes
+
     return (
         <div>
-            <GoogleMapComponent mapRef={mapRef}/>
+            <GoogleMapComponent mapRef={mapRef} />
             {/* Button with car icon styled like the example */}
             <div style={{
                 position: 'absolute',
@@ -121,7 +177,7 @@ const RunnerBoard = () => {
                     textAlign: 'center',
                 }}>
                     <button
-                        onClick={closeModal}
+                        onClick={closeModal} // Added closeModal here
                         style={{
                             position: 'absolute',
                             top: '-10px', // Move slightly above the modal for visibility

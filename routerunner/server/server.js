@@ -266,8 +266,21 @@ app.get('/api/user/lastlocation', async (req,res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json({ postalCode: user.lastlocation, username });
+    res.json({ postalCode: user.lastlocation, username,newlocation });
   } catch (error) {
+    console.error('Error fetching user location:', error);
+    res.status(500).json({ message: 'Error fetching user location' });
+  }
+});
+
+
+//Test Function
+app.get('/api/user/newUserLocation', async (req,res) => {
+  try {
+    const newlocation  = "238857";
+    res.json({ newlocation : newlocation });
+  }
+  catch (error) {
     console.error('Error fetching user location:', error);
     res.status(500).json({ message: 'Error fetching user location' });
   }
