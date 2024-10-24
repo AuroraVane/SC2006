@@ -287,7 +287,7 @@ app.get('/api/runners', async (req, res) => {
 app.get('/api/user/location', async (req,res) => {
   try {
     // Get the user's username from the token
-    const {username} = req.query.username;
+    const username = req.query.username;
     const user = await User.findOne({ username: username });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
