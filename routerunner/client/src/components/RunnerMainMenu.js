@@ -87,7 +87,6 @@ const RunnerBoard = () => {
         // Fetch new location once the component is mounted
         const fetchNewLocation = async () => {
             try {
-                console.log(decodedtoken.username);
                 const response = await axios.get('/api/user/location', { params: { username: decodedtoken.username } });
                 setLastLocation(response.data.lastlocation); // This will trigger re-render
                 setNewLocation(response.data.newlocation); // This will trigger re-render
@@ -100,7 +99,6 @@ const RunnerBoard = () => {
 
     useEffect(() => {
         const handleRouting = async () => {
-            console.log(lastlocation, newlocation);
             if (lastlocation && newlocation) {
                 // Geocode the last location and new location
                 const lastLoc = await geocodePostalCode(lastlocation);

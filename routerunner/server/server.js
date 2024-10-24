@@ -288,12 +288,10 @@ app.get('/api/user/location', async (req,res) => {
   try {
     // Get the user's username from the token
     const username = req.query.username;
-    console.log(username);
     const user = await User.findOne({ username: username });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    console.log(user.lastlocation,user.newlocation);
     res.json({ lastlocation: user.lastlocation, newlocation: user.newlocation });
   } catch (error) {
     console.error('Error fetching user location:', error);
