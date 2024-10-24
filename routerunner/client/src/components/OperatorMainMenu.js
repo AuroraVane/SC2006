@@ -4,49 +4,25 @@ import GoogleMapComponent from './GoogleMap';
 
 const OperatorMainMenu = () => {
   const mapRef = useRef(null); // Reference to the Google Map instance
-  const [postalCode, setPostalCode] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeRunners, setActiveRunners] = useState([]);
+  const [runnerLocations, setRunnerLocations] = useState([]);
 
-  // Fetch active runners from the backend
-  useEffect(() => {
-    const fetchActiveRunners = async () => {
-      try {
-        const response = await axios.get('/api/activerunner');
-        setActiveRunners(response.data);
-      } catch (error) {
-        console.error('Error fetching active runners:', error);
-      }
-    };
-
-    fetchActiveRunners();
-  }, []);
-
-  const createMarker = (lat, lng) => {
+  // Function to create markers on the map with different colors
+  const createMarker = (lat, lng, color) => {
     if (mapRef.current && window.google?.maps?.Marker) {
-      const newMarker = new window.google.maps.Marker({
+      new window.google.maps.Marker({
         position: { lat, lng },
         map: mapRef.current, // Make sure we are passing the correct map instance
+        icon: {
+          url: `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png` // Set the color for the marker
+        }
       });
     } else {
-      console.error("Google Maps Marker not available or map not loaded");
+      console.error('Google Maps Marker not available or map not loaded');
     }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const geocodeResult = await geocodePostalCode(postalCode);
-
-    if (geocodeResult) {
-      const { lat, lng } = geocodeResult;
-      createMarker(lat, lng);
-      setIsModalOpen(false);
-      setPostalCode('');
-    } else {
-      alert('Unable to find location for the given postal code.');
-    }
-  };
-
+  // Function to geocode postal codes into lat/lng
   const geocodePostalCode = async (postalCode) => {
     try {
       const geocoder = new window.google.maps.Geocoder();
@@ -64,57 +40,73 @@ const OperatorMainMenu = () => {
     return null;
   };
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+  // Fetch active runners and their locations
+  useEffect(() => {
+    const fetchActiveRunners = async () => {
+      try {
+        const response = await axios.get('/api/activerunner');
+        setActiveRunners(response.data);
+      } catch (error) {
+        console.error('Error fetching active runners:', error);
+      }
+    };
+
+    fetchActiveRunners();
+  }, []);
+
+  useEffect(() => {
+    const fetchRunnerLocations = async () => {
+      try {
+        const locationPromises = activeRunners.map(async (runner) => {
+          const response = await axios.get('/api/user/location', { params: { username: runner.username } });
+          return {
+            username: runner.username,
+            lastlocation: response.data.lastlocation,
+            newlocation: response.data.newlocation,
+          };
+        });
+
+        const locations = await Promise.all(locationPromises);
+        setRunnerLocations(locations);
+      } catch (error) {
+        console.error('Error fetching runner locations:', error);
+      }
+    };
+
+    if (activeRunners.length > 0) {
+      fetchRunnerLocations();
+    }
+  }, [activeRunners]);
+
+  // Geocode postal codes and create markers
+  useEffect(() => {
+    const createMarkersForLocations = async () => {
+      const colors = ['red', 'blue', 'green', 'purple', 'yellow']; // Define a set of colors
+      for (const [index, runner] of runnerLocations.entries()) {
+        const lastLoc = await geocodePostalCode(runner.lastlocation);
+        const newLoc = await geocodePostalCode(runner.newlocation);
+        const color = colors[index % colors.length]; // Cycle through colors
+
+        if (lastLoc) {
+          createMarker(lastLoc.lat, lastLoc.lng, color); // Create marker for last location with color
+        }
+        if (newLoc) {
+          createMarker(newLoc.lat, newLoc.lng, color); // Create marker for new location with color
+        }
+      }
+    };
+
+    if (runnerLocations.length > 0) {
+      createMarkersForLocations(); // Create markers for all runners
+    }
+  }, [runnerLocations]); // Runs when runnerLocations is updated
 
   return (
     <div style={{ position: 'relative', height: '100vh' }}>
       {/* Render the Google Map Component and pass the map reference */}
       <GoogleMapComponent mapRef={mapRef} />
 
-      {/* Button to open modal for adding marker */}
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 1,
-      }}>
-        <button onClick={toggleModal} style={{
-          padding: '10px',
-          backgroundColor: '#fff',
-          border: '2px solid #000',
-          borderRadius: '4px',
-          cursor: 'pointer'
-        }}>
-          Add Marker by Postal Code
-        </button>
-      </div>
-
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={toggleModal}>X</span>
-            <form onSubmit={handleSubmit}>
-              <label>
-                Postal Code:
-                <input
-                  type="text"
-                  name="postalCode"
-                  placeholder="Enter postal code"
-                  value={postalCode}
-                  onChange={(e) => setPostalCode(e.target.value)}
-                />
-              </label>
-              <br />
-              <button type="submit">Add Marker</button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Active Runners Container */}
+      {/* Active Runners List */}
       <div style={{
         position: 'absolute',
         bottom: '20px',
@@ -137,43 +129,11 @@ const OperatorMainMenu = () => {
               borderRadius: '5px',
               boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
             }}>
-              {index + 1}: {runner.username} ({runner.email})
+              {runner.username}: {runner.lastlocation}
             </li>
           ))}
         </ul>
       </div>
-
-      <style jsx="true">{`
-        .modal {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          position: fixed;
-          z-index: 1;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          overflow: auto;
-          background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-          background-color: #fefefe;
-          padding: 20px;
-          border-radius: 8px;
-          width: 300px;
-          position: relative;
-        }
-
-        .close {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          cursor: pointer;
-          font-size: 20px;
-        }
-      `}</style>
     </div>
   );
 };
