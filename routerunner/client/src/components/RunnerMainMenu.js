@@ -11,9 +11,8 @@ const RunnerBoard = () => {
     const directionsRendererRef = useRef(null); // For route rendering
     const token = localStorage.getItem('token');
     const decodedtoken = token ? parseJwt(token) : null;
-    const [lastLocation, setLastLocation] = useState('');
-    const lastlocation = decodedtoken?.lastlocation;
-    const [newlocation, setnewLocation] = useState('');
+    const [lastlocation, setLastLocation] = useState('');
+    const [newlocation, setNewLocation] = useState('');
     const [showCarpark, setShowCarpark] = useState(false); // State to show/hide carpark data
 
     // Function to handle carpark button click
@@ -88,8 +87,10 @@ const RunnerBoard = () => {
         // Fetch new location once the component is mounted
         const fetchNewLocation = async () => {
             try {
-                const response = await axios.get('/api/user/newlocation');
-                setnewLocation(response.data.newlocation); // This will trigger re-render
+                console.log(decodedtoken.username);
+                const response = await axios.get('/api/user/location', { params: { username: decodedtoken.username } });
+                setLastLocation(response.data.lastlocation); // This will trigger re-render
+                setNewLocation(response.data.newlocation); // This will trigger re-render
             } catch (error) {
                 console.error('Error fetching active runners:', error);
             }
@@ -99,6 +100,7 @@ const RunnerBoard = () => {
 
     useEffect(() => {
         const handleRouting = async () => {
+            console.log(lastlocation, newlocation);
             if (lastlocation && newlocation) {
                 // Geocode the last location and new location
                 const lastLoc = await geocodePostalCode(lastlocation);
