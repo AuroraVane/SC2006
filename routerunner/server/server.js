@@ -287,7 +287,7 @@ app.get('/api/runners', async (req, res) => {
 app.get('/api/user/location', async (req,res) => {
   try {
     // Get the user's username from the token
-    const username = req.query.username;
+    const {username} = req.query.username;
     const user = await User.findOne({ username: username });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -302,16 +302,55 @@ app.get('/api/user/location', async (req,res) => {
 
 
 //Test Function
-app.get('/api/user/newUserLocation', async (req,res) => {
+app.get('/api/user/jobCompleted', async (req,res) => {
+  const {username} = req.query;
   try {
-    const newlocation  = "238857";
-    res.json({ newlocation : newlocation });
+    // await Job.updateMany({}, {$set: {status:'waiting', runnerUsername:'null'}});
+    const jobcompleted = await Job.findOne({status:'ongoing', runnerUsername:username});
+    const jobcompletedupdate = await Job.updateOne({
+      status: 'ongoing',
+      runnerUsername: username,
+    }, {$set:{
+      status: 'completed',
+    }});
+    const jobongoingupdate = await Job.updateOne({
+      status: 'waiting',
+    }, {$set:{
+      runnerUsername: username,
+      status: 'ongoing'
+    }})
+    jobongoing = await Job.findOne({runnerUsername: username, status:'ongoing'})
+    const addresscompleted = await Address.findOne({_id: jobcompleted.address});
+    const addressongoing = await Address.findOne({_id: jobongoing.address});
+    const user = await User.updateOne({
+      username: username,
+    }, {$set:{
+      lastlocation: addresscompleted.postalCode,
+      newlocation: addressongoing.postalCode
+    }})
+    res.json(addressongoing);
   }
   catch (error) {
     console.error('Error fetching user location:', error);
     res.status(500).json({ message: 'Error fetching user location' });
   }
 });
+
+app.post('/api/resetDB', async (req, res) => {
+  await Job.updateMany({}, {$set: {status:'waiting', runnerUsername:'null'}});
+  await Job.updateOne({
+    status:'waiting'
+  },{$set:{
+    runnerUsername:'abc',
+    status:'ongoing'
+  }})
+  await User.updateOne({
+    username: 'abc'
+  }, {$set:{
+    lastlocation:'238823',
+    newlocation:'639798'
+  }})
+})
 
 // Start the server
 app.listen(5001, () => {

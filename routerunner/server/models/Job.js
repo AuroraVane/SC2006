@@ -9,12 +9,11 @@ const jobSchema = new mongoose.Schema({
         required: false,
         unique: false,
     },
-    runnerID: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+    runnerUsername: {
+        type: String,
         required: false,
         unique: false,
-        default: null,
+        default: 'null',
     },
     note: { type: String, required: false, unique: false},
     priority: { type: Boolean, required: false, unique: false},

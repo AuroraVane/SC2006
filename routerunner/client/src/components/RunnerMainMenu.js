@@ -43,17 +43,16 @@ const RunnerBoard = () => {
         return null;
     };
 
-    // Function to create markers on the map
-    const createMarker = (lat, lng) => {
-        if (mapRef.current && window.google?.maps?.Marker) {
-            new window.google.maps.Marker({
-                position: { lat, lng },
-                map: mapRef.current,
-            });
-        } else {
-            console.error('Google Maps Marker not available or map not loaded');
-        }
-    };
+    // const createMarker = (lat, lng) => {
+    //     if (mapRef.current && window.google?.maps?.Marker) {
+    //         new window.google.maps.Marker({
+    //             position: { lat, lng },
+    //             map: mapRef.current,
+    //         });
+    //     } else {
+    //         console.error('Google Maps Marker not available or map not loaded');
+    //     }
+    // };
 
     // Function to display the route
     const displayRoute = (start, end) => {
@@ -83,8 +82,21 @@ const RunnerBoard = () => {
         }
     };
 
+    const handleCompletedJob = async () => {
+        try {
+            const response = await axios.get('/api/user/jobCompleted', {
+                params:{
+                    username: decodedtoken.username,
+                }
+            });
+            setNewLocation(response.results[0].postalCode);
+            setLastLocation(newlocation);
+        } catch (error) {
+            console.error('Error fetching new Job:', error);
+        }
+    }
+
     useEffect(() => {
-        // Fetch new location once the component is mounted
         const fetchNewLocation = async () => {
             try {
                 const response = await axios.get('/api/user/location', { params: { username: decodedtoken.username } });
@@ -100,27 +112,72 @@ const RunnerBoard = () => {
     useEffect(() => {
         const handleRouting = async () => {
             if (lastlocation && newlocation) {
-                // Geocode the last location and new location
-                const lastLoc = await geocodePostalCode(lastlocation);
-                const newLoc = await geocodePostalCode(newlocation);
-
-                if (lastLoc && newLoc) {
-                    createMarker(lastLoc.lat, lastLoc.lng); // Drop marker for last location
-                    createMarker(newLoc.lat, newLoc.lng);   // Drop marker for new location
-
-                    // Display the route
-                    displayRoute(lastLoc, newLoc);
+                try {
+                    const lastLoc = await geocodePostalCode(lastlocation);
+                    const newLoc = await geocodePostalCode(newlocation);
+        
+                    if (lastLoc && newLoc) {
+                        // createMarker(lastLoc.lat, lastLoc.lng);
+                        // createMarker(newLoc.lat, newLoc.lng);
+                        displayRoute(lastLoc, newLoc);
+                    }
+                } catch (error) {
+                    console.error("Error during geocoding:", error);
                 }
             }
         };
-
         handleRouting(); // Call the routing logic after locations are available
     }, [lastlocation, newlocation]); // Trigger when lastlocation or newlocation changes
 
     return (
         <div>
             <GoogleMapComponent mapRef={mapRef} />
-            {/* Button with car icon styled like the example */}
+            <div style={{
+                position: 'absolute',
+                bottom: '90px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '200px',
+                backgroundColor: '#fff',
+                borderRadius: '12px',
+                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                padding: '10px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+            }}>
+                <span style={{
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#333'
+                }}>
+                </span>
+                <button
+                    onClick={handleCompletedJob} // Corrected the syntax for the onClick handler
+                    style={{
+                        fontSize: '24px',
+                        background: '#f0f0f0', // Light grey background
+                        border: '2px solid #ccc', // Add a visible border
+                        borderRadius: '8px', // Use a smaller border radius for a rectangular button
+                        padding: '10px 20px', // Adjust padding for a more rectangular shape
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10,
+                        width: '100%', // Make button full width
+                    }}>
+                    <span style={{
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#333'
+                    }}>
+                    Completed Job
+                    </span>
+                </button>
+            </div>
+
             <div style={{
                 position: 'absolute',
                 bottom: '20px',
