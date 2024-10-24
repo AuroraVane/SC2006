@@ -40,7 +40,7 @@ const App = () => {
             <Route path="/mngrnr" element={<ProtectedRoute element={ManageRunner} allowedUsertype="operator" />} />
             <Route path="/createnewrunner" element={<ProtectedRoute element={CreateNewRunner} allowedUsertype="operator" />} />
             <Route path="/createnewjob" element={<ProtectedRoute element={CreateNewJob} allowedUsertype="operator" />} />
-            <Route path="/viewrunner/:userID" element={<ProtectedRoute element={ViewRunner} allowedUsertype="operator" />} />
+            <Route path="/viewrunner/:username" element={<ProtectedRoute element={ViewRunner} allowedUsertype="operator"/>} />
             <Route path="/historylogs" element={<ProtectedRoute element={HistoryLogs} allowedUsertype="operator" />} />
 
             {/* Runner Routes */}

@@ -7,11 +7,26 @@ const ViewRunner = () => {
   const { runnerId } = useParams(); // Get runnerId from the URL
   const [runnerData, setRunnerData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [newLocation, setNewLocation] = useState('');
+  const [lastlocation, setLastLocation] = useState('');
+  const { username } = useParams();
 
+  useEffect(() => {
+    const fetchNewLocation = async () => {
+      try {
+        const response = await axios.get('/api/user/location', { params: { username: username } });
+        setNewLocation(response.data.newlocation);
+        setLastLocation(response.data.lastlocation);
+      } catch (error) {
+        console.error('Error fetching new location:', error);
+      }
+    };
+    fetchNewLocation();
+  }, []);
   useEffect(() => {
     // Temporary runner data for testing
     const tempRunnerData = {
-      username: 'runner1',
+      username: username,
       lastLocation: 'Location A',
       currentDestination: 'Location B',
       otherLocations: [
@@ -40,7 +55,7 @@ const ViewRunner = () => {
     };
 
     fetchRunnerData();
-  }, [runnerId]);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -60,7 +75,7 @@ const ViewRunner = () => {
         <ul>
           {runnerData.otherLocations.map((location) => (
             <li key={location.id} className="location-item">
-              {location.name} 
+              {location.name}
               <Link to={`/viewjobdetails/${location.id}`}>
                 <button className="view-job-button">View Job Details</button>
               </Link>
@@ -70,11 +85,11 @@ const ViewRunner = () => {
       </div>
 
       <div className="button-group">
-        <button className="reroute-button" onClick={() => {/* Handle rerouting logic here */}}>
+        <button className="reroute-button" onClick={() => {/* Handle rerouting logic here */ }}>
           Reroute
         </button>
 
-        <button className="delete-button" onClick={() => {/* Handle delete runner logic here */}}>
+        <button className="delete-button" onClick={() => {/* Handle delete runner logic here */ }}>
           Delete Runner
         </button>
       </div>
