@@ -75,8 +75,8 @@ const CreateNewJob = () => {
       },
       note: note,
       priority: priority,
-      runnerID: 1,
-      status: true,
+      runnerID: null,
+      status: 'waiting',
     };
 
     try {

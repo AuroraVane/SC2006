@@ -223,10 +223,11 @@ const Job = require('./models/Job');
 const Address = require('./models/Address');
 
 app.post('/api/jobs', async (req, res) => {
+  console.log("Entered backend")
   const { jobID, address, runner, note, priority, status } = req.body;
 
   // Validate required fields
-  if (!jobID || !address || typeof status !== 'boolean') {
+  if (!jobID || !address) {
       return res.status(400).json({ message: 'jobID, startAddress, and status are required.' });
   }
   try { 
@@ -242,10 +243,10 @@ app.post('/api/jobs', async (req, res) => {
     console.log({ message: 'Address created successfully', job: newAddress})
     const newJob = new Job({
           jobID: jobID,
-          address: newAddress._id, // Handle if endAddress is provided
+          address: newAddress._id,
           priority: priority || false,
           note: note || null,
-          runner: runner || null, // Handle if runner is provided
+          runner: runner || null,
           status: status,
     });
 
