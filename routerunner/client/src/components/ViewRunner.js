@@ -27,8 +27,8 @@ const ViewRunner = () => {
     // Temporary runner data for testing
     const tempRunnerData = {
       username: username,
-      lastLocation: 'Location A',
-      currentDestination: 'Location B',
+      lastLocation: lastlocation,
+      currentDestination: newLocation,
       otherLocations: [
         { id: '1', name: 'Location C' },
         { id: '2', name: 'Location D' },
@@ -55,7 +55,7 @@ const ViewRunner = () => {
     };
 
     fetchRunnerData();
-  }, []);
+  }, [newLocation, lastlocation]);
 
   if (loading) {
     return <div>Loading...</div>;
