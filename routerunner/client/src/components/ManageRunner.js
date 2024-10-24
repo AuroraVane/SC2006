@@ -45,8 +45,8 @@ const ManageRunner = () => {
       <div className="runner-list-container">
         <ul>
           {sortedRunners.map((runner) => (
-            <li key={runner.id} className="runner-item">
-              <Link to={`/viewrunner/${runner.id}`} className="runner-link">
+            <li key={runner._id} className="runner-item">
+              <Link to={`/viewrunner/${runner._id}`} className="runner-link">
                 {runner.username}
                 <span style={{ marginLeft: '10px' }}>
                   {runner.active ? '🟢' : '🔴'} {/* Green circle for active, red for inactive */}
