@@ -123,7 +123,7 @@ app.post('/api/login', async (req, res) => {
 
     // Create JWT token
     const token = jwt.sign(
-      { userId: user._id, username: user.username, usertype: user.usertype, lastlocation: user.lastlocation }, // Payload (data stored in the token)
+      { userId: user._id, username: user.username, usertype: user.usertype, lastlocation: user.lastlocation, newlocation: user.newlocation }, // Payload (data stored in the token)
       process.env.JWT_SECRET, // Secret key from .env
       { expiresIn: '1h' } // Token expiration (1 hour in this case)
     );
@@ -283,7 +283,7 @@ app.get('/api/runners', async (req, res) => {
   }
 });
 
-app.get('/api/user/lastlocation', async (req,res) => {
+app.get('/api/user/location', async (req,res) => {
   try {
     // Get the user's username from the token
     const { username } = req.user;
@@ -291,12 +291,13 @@ app.get('/api/user/lastlocation', async (req,res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json({ postalCode: user.lastlocation, username,newlocation });
+    res.json({ lastlocation: user.lastlocation, newlocation: user.newlocation });
   } catch (error) {
     console.error('Error fetching user location:', error);
     res.status(500).json({ message: 'Error fetching user location' });
   }
 });
+
 
 
 //Test Function
