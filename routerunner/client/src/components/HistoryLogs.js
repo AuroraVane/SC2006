@@ -151,7 +151,7 @@ const HistoryLogs = () => {
                     {log.job.status || 'N/A'}
                   </span>
                 </td>
-                <td style={styles.td}>{new Date(log.date).toLocaleDateString() || 'N/A'}</td>
+                <td style={styles.td}>{log.date|| 'N/A'}</td>
               </tr>
             ) : (
               <tr key={log._id}>
