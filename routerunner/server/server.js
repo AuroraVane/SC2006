@@ -193,7 +193,6 @@ app.get('/api/carpark-availability', async (req, res) => {
 
 // ==================== HISTORY LOGS ENDPOINT ====================
 
-// Import the HistoryLogs model
 const HistoryLogs = require('./models/HistoryLogs');
 
 // API route to fetch history logs
@@ -201,10 +200,16 @@ app.get('/api/historylogs', async (req, res) => {
   try {
     // Find all history logs and populate related fields
     const logs = await HistoryLogs.find()
-      .populate('job')  // Populating the 'job' field with associated job details
+      .populate({
+        path: 'job', // Populate the 'job' field
+        populate: {
+          path: 'address', // Populate the 'address' field inside the 'job'
+          model: 'Address' // Reference the Address collection
+        }
+      })
       .exec();
 
-    // Send the logs as JSON
+    // Send the populated logs as JSON
     res.json(logs);
   } catch (error) {
     console.error('Error fetching history logs:', error);
