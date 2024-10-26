@@ -90,7 +90,12 @@ const RunnerBoard = () => {
                 }
             });
             setLastLocation(newlocation);
+<<<<<<< HEAD
             setNewLocation(response.results[0].postalCode);
+=======
+            console.log('Job completed:', String(response.data.postalCode));
+            setNewLocation(String(response.data.postalCode));
+>>>>>>> RunnerMainMenu
         } catch (error) {
             console.error('Error fetching new Job:', error);
         }

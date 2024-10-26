@@ -348,7 +348,7 @@ app.get('/api/user/jobCompleted', async (req,res) => {
       lastlocation: addresscompleted.postalCode,
       newlocation: addressongoing.postalCode
     }})
-    res.json(addressongoing);
+    res.json({postalCode: addressongoing.postalCode });
   }
   catch (error) {
     console.error('Error fetching user location:', error);
