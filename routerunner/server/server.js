@@ -145,6 +145,21 @@ app.get('/api/users', authenticateJWT, async (req, res) => {
   }
 });
 
+app.delete('/api/runners/delete:username', async (req, res) => {
+  const { username } = req.params;
+  console.log(username);
+  try {
+    const deletedRunner = await User.findOneAndDelete({ username:username });
+    if (!deletedRunner) {
+      return res.status(404).json({ message: 'Runner not found' });
+    }
+    res.json({ message: 'Runner deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting runner:', error);
+    res.status(500).json({ message: 'Error deleting runner' });
+  }
+});
+
 // ==================== END USER AUTHENTICATION ====================
 
 // ==================== API ENDPOINTS ====================

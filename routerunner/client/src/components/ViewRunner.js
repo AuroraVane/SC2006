@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ViewRunner = () => {
+  const navigate = useNavigate();
   const { runnerId } = useParams(); // Get runnerId from the URL
   const [runnerData, setRunnerData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,6 +23,7 @@ const ViewRunner = () => {
         console.error('Error fetching new location:', error);
       }
     };
+    
     fetchNewLocation();
   }, []);
   useEffect(() => {
@@ -57,6 +60,17 @@ const ViewRunner = () => {
     fetchRunnerData();
   }, [newLocation, lastlocation]);
 
+  const handleDeleteRunner = async () => {
+    try {
+      await axios.delete(`/api/runners/delete${username}`);
+      navigate('/mngrnr');
+    } catch (error) {
+      console.error('Error deleting runner:', error);
+    }
+  };
+
+
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -88,8 +102,7 @@ const ViewRunner = () => {
         <button className="reroute-button" onClick={() => {/* Handle rerouting logic here */ }}>
           Reroute
         </button>
-
-        <button className="delete-button" onClick={() => {/* Handle delete runner logic here */ }}>
+        <button className="delete-button" onClick={handleDeleteRunner}>
           Delete Runner
         </button>
       </div>
