@@ -31,7 +31,7 @@ const BurgerMenu = () => {
             <>
               <li><Link to={`/omm/${username}`}>Home</Link></li>
               <li><Link to="/mngjob">Manage Jobs</Link></li>
-              <li><Link to="/mngrnr">Manage Runner</Link></li>
+              <li><Link to="/mngrnr">Manage Runners</Link></li>
               <li><button onClick={handleLogout}>Logout</button></li>
             </>
           )}
