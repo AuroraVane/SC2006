@@ -9,7 +9,7 @@ import NotFound from './components/NotFound';
 import ViewJobDetails from './components/ViewJobDetails';
 import OperatorMainMenu from './components/OperatorMainMenu';
 import ManageJobs from './components/ManageJobs';
-import ManageRunner from './components/ManageRunner';
+import ManageRunner from './components/ManageRunners';
 import CreateNewRunner from './components/CreateNewRunner';
 import HistoryLogs from './components/HistoryLogs';
 import ViewRunner from './components/ViewRunner';
