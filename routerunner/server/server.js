@@ -17,6 +17,9 @@ require('dotenv').config(); // Load environment variables from a .env file
 // Import the Models from external file
 const User = require('./models/User');
 const Carpark = require('./models/Carpark');
+const Job = require('./models/Job');
+const HistoryLogs = require('./models/HistoryLogs')
+const Address = require('./models/Address')
 
 // Create an Express App
 const app = express();
@@ -207,9 +210,6 @@ app.get('/api/carpark-availability', async (req, res) => {
 });
 
 // ==================== HISTORY LOGS ENDPOINT ====================
-
-const HistoryLogs = require('./models/HistoryLogs');
-
 // API route to fetch history logs
 app.get('/api/historylogs', async (req, res) => {
   try {
@@ -236,12 +236,42 @@ app.get('/api/historylogs', async (req, res) => {
 // ==================== END API ENDPOINTS ====================
 
 
+// ==================== JOB QUERY ENDPOINT====================
+app.get('/api/runner-job', async (req, res) => {
+  try {
+    // Get the user's username from the token
+    const username = req.query.username;
+    const job = await Job.findOne({
+      username: username,
+      status: 'ongoing'
+    });
+    const jobaddress = await Address.findOne({
+      _id: job.address,
+    });
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+    res.json({
+      jobID: job.jobID,
+      street: jobaddress.street,
+      block: jobaddress.block,
+      unitNumber: jobaddress.unitNumber,
+      postalCode: jobaddress.postalCode,
+      runnerUsername: job.runnerUsername,
+      note: job.note,
+      priority: job.priority,
+      status: job.status
+    });
+  } catch (error) {
+    console.error('Error fetching job:', error);
+    res.status(500).json({ message: 'Error fetching job' });
+  }
+})
+// ==================== END API ENDPOINTS ====================
+
+
+
 // ==================== JOB CREATION ENDPOINT ====================
-
-// Import the Job model
-const Job = require('./models/Job');
-const Address = require('./models/Address');
-
 app.post('/api/jobs', async (req, res) => {
   console.log("Entered backend")
   const { jobID, address, runner, note, priority, status } = req.body;

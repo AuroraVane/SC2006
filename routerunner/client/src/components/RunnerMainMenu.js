@@ -107,7 +107,7 @@ const RunnerBoard = () => {
             }
         };
         fetchNewLocation(); // Start fetching new location
-    }, []); // Empty dependency array ensures this runs once on mount
+    }); // Empty dependency array ensures this runs once on mount
 
     useEffect(() => {
         const handleRouting = async () => {
