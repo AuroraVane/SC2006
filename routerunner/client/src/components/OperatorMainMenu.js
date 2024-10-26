@@ -100,7 +100,7 @@ const OperatorMainMenu = () => {
       createMarkersForLocations(); // Create markers for all runners
     }
   }, [runnerLocations]); // Runs when runnerLocations is updated
-
+  //viewrunner/:username
   return (
     <div style={{ position: 'relative', height: '100vh' }}>
       {/* Render the Google Map Component and pass the map reference */}
@@ -120,17 +120,26 @@ const OperatorMainMenu = () => {
         textAlign: 'center',
       }}>
         <h3>Active Runners</h3>
-        <ul style={{ listStyleType: 'none', padding: 0 }}>
+        <ul style={{ listStyleType: 'none', padding: 0, }}>
           {activeRunners.map((runner, index) => (
-            <li key={runner._id} style={{
-              margin: '10px 0',
-              padding: '10px',
-              backgroundColor: '#fff',
-              borderRadius: '5px',
-              boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
-            }}>
-              {runner.username}: {runner.lastlocation}
-            </li>
+            <><button 
+              onClick = {() => { window.location.href = `/viewrunner/${runner.username}`}}
+              style={{
+                margin: '7px 0',
+                display: 'flex',               // Flexbox for alignment
+                alignItems: 'center',           // Center content vertically
+                justifyContent: 'center',       // Center content horizontally
+                width: '100%',                  // Full width
+                padding: '15px 10px',           // Padding for spacing
+                backgroundColor: '#fff',
+                borderRadius: '5px',
+                boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
+                border: 'none',                 // Remove border
+                cursor: 'pointer',              // Pointer cursor
+                textAlign: 'center',            // Center text inside
+                fontSize: '16px',               // Font size for readability
+                color: '#333'  , 
+            }}>{runner.username}: {runner.lastlocation}</button></>
           ))}
         </ul>
       </div>
