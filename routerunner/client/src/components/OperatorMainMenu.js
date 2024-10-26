@@ -99,7 +99,6 @@ const OperatorMainMenu = () => {
 
         const resolveLocations = await Promise.all(locationPromises);
         setRunnerLocationsAddress(resolveLocations);
-        console.log(runnerLocationsAddress);
       } catch (error) {
         console.error('Error fetching runner locations:', error);
       }
