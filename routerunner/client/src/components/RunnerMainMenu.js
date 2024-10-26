@@ -89,8 +89,8 @@ const RunnerBoard = () => {
                     username: decodedtoken.username,
                 }
             });
-            setNewLocation(response.results[0].postalCode);
             setLastLocation(newlocation);
+            setNewLocation(response.results[0].postalCode);
         } catch (error) {
             console.error('Error fetching new Job:', error);
         }
