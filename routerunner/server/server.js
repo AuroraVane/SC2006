@@ -56,9 +56,9 @@ app.post('/api/register', async (req, res) => {
   }
 
   // Validate password requirements
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   if (!passwordRegex.test(password)) {
-    errors.push('Password must be at least 10 characters long, contain upper and lower case letters, and at least one special character.');
+    errors.push('Password must be at least 8 characters long, contain upper and lower case letters, and at least one special character.');
   }
 
   // Check if the user already exists
