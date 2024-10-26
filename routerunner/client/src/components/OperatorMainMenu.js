@@ -6,6 +6,7 @@ const OperatorMainMenu = () => {
   const mapRef = useRef(null); // Reference to the Google Map instance
   const [activeRunners, setActiveRunners] = useState([]);
   const [runnerLocations, setRunnerLocations] = useState([]);
+  const [runnerLocationsAddress, setRunnerLocationsAddress] = useState([]);
 
   // Function to create markers on the map with different colors
   const createMarker = (lat, lng, color) => {
@@ -68,6 +69,7 @@ const OperatorMainMenu = () => {
 
         const locations = await Promise.all(locationPromises);
         setRunnerLocations(locations);
+        
       } catch (error) {
         console.error('Error fetching runner locations:', error);
       }
@@ -76,6 +78,33 @@ const OperatorMainMenu = () => {
     if (activeRunners.length > 0) {
       fetchRunnerLocations();
     }
+  }, [activeRunners]);
+  useEffect(() => {
+    const fetchRunnerLocationsAddress = async () => {
+      try {
+        const locationPromises = activeRunners.map(async (runner) => {
+          const response = await axios.get("https://www.onemap.gov.sg/api/common/elastic/search", {
+            params: {
+              searchVal: runner.lastlocation,
+              returnGeom: 'Y',
+              getAddrDetails: 'Y',
+              pageNum: 1
+            },
+          });
+          return {
+            username: runner.username,
+            lastlocation: response.data.results[0]["ROAD_NAME"],
+          };
+        });
+
+        const resolveLocations = await Promise.all(locationPromises);
+        setRunnerLocationsAddress(resolveLocations);
+        console.log(runnerLocationsAddress);
+      } catch (error) {
+        console.error('Error fetching runner locations:', error);
+      }
+    };
+    fetchRunnerLocationsAddress();
   }, [activeRunners]);
 
   // Geocode postal codes and create markers
@@ -100,7 +129,8 @@ const OperatorMainMenu = () => {
       createMarkersForLocations(); // Create markers for all runners
     }
   }, [runnerLocations]); // Runs when runnerLocations is updated
-  //viewrunner/:username
+
+  
   return (
     <div style={{ position: 'relative', height: '100vh' }}>
       {/* Render the Google Map Component and pass the map reference */}
@@ -139,7 +169,7 @@ const OperatorMainMenu = () => {
                 textAlign: 'center',            // Center text inside
                 fontSize: '16px',               // Font size for readability
                 color: '#333'  , 
-            }}>{runner.username}: {runner.lastlocation}</button></>
+            }}>{runner.username}: {runnerLocationsAddress[index]?.lastlocation || 'Loading...'}</button></>
           ))}
         </ul>
       </div>
