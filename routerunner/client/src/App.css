@@ -281,7 +281,7 @@ button:hover {
   background-color: #0056b3;
 }
 
-.reroute-button,
+.resetpassword-button,
 .delete-button,
 .back-button {
   margin-top: 20px; 
@@ -295,7 +295,7 @@ button:hover {
   font-size: 1rem; 
 }
 
-.reroute-button:hover,
+.resetpassword-button:hover,
 .delete-button:hover,
 .back-button:hover {
   background-color: #0056b3; 

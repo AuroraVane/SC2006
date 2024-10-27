@@ -104,6 +104,39 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+app.post('/api/resetpassword', async (req, res) => {
+  const { username, password } = req.body;
+  const errors = [];
+  
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordRegex.test(password)) {
+      errors.push('Password must be at least 8 characters long, contain upper and lower case letters, and at least one special character.');
+  }
+
+  if (errors.length > 0) {
+      return res.status(400).json({ errors });
+  }
+
+  try {
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Update the user's password in the database
+      const result = await User.updateOne({ username: username }, { $set: { password: hashedPassword } });
+
+      // Check if the user was found and updated
+      if (result.modifiedCount === 0) {
+          return res.status(404).json({ message: 'User not found.' });
+      }
+
+      return res.status(200).json({ message: 'Password has been reset successfully.' });
+  } catch (error) {
+      console.error('Error resetting password:', error);
+      return res.status(500).json({ message: 'An error occurred while resetting the password.' });
+  }
+});
+
+
 // POST: Login an existing user
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
