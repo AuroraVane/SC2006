@@ -237,13 +237,13 @@ app.get('/api/historylogs', async (req, res) => {
 
 
 // ==================== JOB QUERY ENDPOINT====================
-app.get('/api/runner/job', async (req, res) => {
+app.get('/api/runner-job', async (req, res) => {
   try {
     // Get the user's username from the token
     const username = req.query.username;
     const job = await Job.findOne({
-      runnerUsername: username,
-      status: "ongoing",
+      username: username,
+      status: 'ongoing'
     });
     const jobaddress = await Address.findOne({
       _id: job.address,
