@@ -99,9 +99,11 @@ const ViewRunner = () => {
       </div>
 
       <div className="button-group">
-        <button className="reroute-button" onClick={() => {/* Handle rerouting logic here */ }}>
-          Reroute
-        </button>
+        <Link to = {`/resetpassword/${username}`}>
+          <button className="resetpassword-button" onClick>
+            Reset Password
+          </button>
+        </Link>
         <button className="delete-button" onClick={handleDeleteRunner}>
           Delete Runner
         </button>
