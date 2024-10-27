@@ -11,13 +11,13 @@ const ViewJobs = () => {
 
   useEffect(() => {
     const fetchJobData = async () => {
-      const response = await axios.get('/api/runner-job/', {username: username});
+      const response = await axios.get('/api/runner/job/', {params: {username}},);
       setJobData(response.data);
     }
     console.log(jobData)
     fetchJobData();
   },)
-
+  
   return (
     <div className="job-description">
       <h1 className="job-title">View Job</h1>
