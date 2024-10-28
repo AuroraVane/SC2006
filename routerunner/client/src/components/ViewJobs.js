@@ -11,7 +11,7 @@ const ViewJobs = () => {
 
   useEffect(() => {
     const fetchJobData = async () => {
-      const response = await axios.get('/api/runner-job/', {username: username});
+      const response = await axios.get('/api/runner-job/', {params: {username}});
       setJobData(response.data);
     }
     console.log(jobData)

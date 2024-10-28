@@ -242,6 +242,9 @@ app.get('/api/carpark-availability', async (req, res) => {
   }
 });
 
+app.get('/api/carpark/fetch3closestcarpark', async (req, res) => {
+
+});
 // ==================== HISTORY LOGS ENDPOINT ====================
 // API route to fetch history logs
 app.get('/api/historylogs', async (req, res) => {
@@ -275,7 +278,7 @@ app.get('/api/runner-job', async (req, res) => {
     // Get the user's username from the token
     const username = req.query.username;
     const job = await Job.findOne({
-      username: username,
+      runnerUsername: username,
       status: 'ongoing'
     });
     const jobaddress = await Address.findOne({
