@@ -14,7 +14,7 @@ const ViewJobs = () => {
       const response = await axios.get('/api/runner-job/', {params: {username}});
       setJobData(response.data);
     }
-    console.log(jobData)
+    //console.log(jobData)
     fetchJobData();
   },)
 

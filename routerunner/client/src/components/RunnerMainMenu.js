@@ -13,6 +13,8 @@ const RunnerBoard = () => {
     const decodedtoken = token ? parseJwt(token) : null;
     const [lastlocation, setLastLocation] = useState('');
     const [newlocation, setNewLocation] = useState('');
+    const [newLocationLat, setNewLocationLat] = useState('');
+    const [newLocationLng, setNewLocationLng] = useState('');
     const [showCarpark, setShowCarpark] = useState(false); // State to show/hide carpark data
 
     // Function to handle carpark button click
@@ -24,6 +26,30 @@ const RunnerBoard = () => {
     const closeModal = () => {
         setShowCarpark(false); // Set the modal visibility to false
     };
+    
+    const handleNearestCarpark = async () => {
+        try {
+          const response = await axios.get('/api/carpark/nearest', {
+            params: {
+              lat: newLocationLat,
+              lng: newLocationLng,
+            },
+          });
+      
+          // Assuming response.data contains the array of JSON objects
+          const carparks = response.data;
+      
+          // Log or use the data as needed
+          console.log("Nearest carparks:", carparks);
+      
+          // Return the array of JSON objects
+          return carparks;
+        } catch (error) {
+          console.error("Error fetching nearest carpark:", error);
+          // Return an empty array or handle error appropriately
+          return [];
+        }
+      };
 
     // Geocoding function
     const geocodePostalCode = async (postalCode) => {
@@ -116,11 +142,14 @@ const RunnerBoard = () => {
                 try {
                     const lastLoc = await geocodePostalCode(lastlocation);
                     const newLoc = await geocodePostalCode(newlocation);
-        
                     if (lastLoc && newLoc) {
                         // createMarker(lastLoc.lat, lastLoc.lng);
                         // createMarker(newLoc.lat, newLoc.lng);
                         displayRoute(lastLoc, newLoc);
+                    }
+                    if (newLoc) {
+                        setNewLocationLat(newLoc.lat);
+                        setNewLocationLng(newLoc.lng);
                     }
                 } catch (error) {
                     console.error("Error during geocoding:", error);
@@ -216,6 +245,23 @@ const RunnerBoard = () => {
                     }}
                 >
                     <FontAwesomeIcon icon={faCar} style={{ color: 'black' }} /> {/* Car icon */}
+                </button>
+                <button
+                    onClick={handleNearestCarpark}
+                    style={{
+                        fontSize: '24px',
+                        background: '#f0f0f0', // Light grey background
+                        border: '2px solid #ccc', // Add a visible border
+                        borderRadius: '50%', // Make it circular
+                        padding: '10px', // Add padding around the icon
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10
+                    }}
+                >
+                    <FontAwesomeIcon icon={faCar} style={{ color: 'blue' }} /> {/* Car icon */}
                 </button>
             </div>
 

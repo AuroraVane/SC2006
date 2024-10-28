@@ -242,9 +242,62 @@ app.get('/api/carpark-availability', async (req, res) => {
   }
 });
 
-app.get('/api/carpark/fetch3closestcarpark', async (req, res) => {
+app.get('/api/carpark/nearest', async (req, res) => {
+  try {
+    // Retrieve latitude and longitude from query parameters
+    const { lat, lng } = req.query;
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lng);
 
+    // Fetch all carparks from the database
+    const carparks = await Carpark.find({});
+
+    // Calculate distances and find the nearest carpark
+    let nearestCarpark = null;
+    let minDistance = Infinity;
+
+    carparks.forEach(carpark => {
+      // Convert carpark's coordinates to floats
+      const carparkLat = parseFloat(carpark.x_coord);
+      const carparkLng = parseFloat(carpark.y_coord);
+
+      // Calculate Euclidean distance using Pythagorean theorem
+      const distance = Math.sqrt(
+        Math.pow(carparkLat - latitude, 2) + Math.pow(carparkLng - longitude, 2)
+      );
+
+      // Update nearest carpark if the current one is closer
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestCarpark = carpark;
+      }
+    });
+
+    // Return the nearest carpark information along with the distance and address
+    res.json({
+      nearestCarpark: {
+        car_park_no: nearestCarpark.car_park_no,
+        address: nearestCarpark.address,
+        x_coord: nearestCarpark.x_coord,
+        y_coord: nearestCarpark.y_coord,
+        car_park_type: nearestCarpark.car_park_type,
+        type_of_parking_system: nearestCarpark.type_of_parking_system,
+        short_term_parking: nearestCarpark.short_term_parking,
+        free_parking: nearestCarpark.free_parking,
+        night_parking: nearestCarpark.night_parking,
+        car_park_decks: nearestCarpark.car_park_decks,
+        gantry_height: nearestCarpark.gantry_height,
+        car_park_basement: nearestCarpark.car_park_basement,
+      },
+      address: nearestCarpark.address,
+      distance: minDistance,
+    });
+  } catch (error) {
+    console.error("Error fetching nearest carpark:", error);
+    res.status(500).json({ message: 'Error fetching nearest carpark' });
+  }
 });
+
 // ==================== HISTORY LOGS ENDPOINT ====================
 // API route to fetch history logs
 app.get('/api/historylogs', async (req, res) => {
