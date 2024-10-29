@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import CarparkAvailability from './ViewCarparkAvailability';
 import GoogleMapComponent from './GoogleMap';
 import { parseJwt } from '../utils/jwtUtils';
 import axios from 'axios';
@@ -16,40 +15,57 @@ const RunnerBoard = () => {
     const [newLocationLat, setNewLocationLat] = useState('');
     const [newLocationLng, setNewLocationLng] = useState('');
     const [showCarpark, setShowCarpark] = useState(false); // State to show/hide carpark data
+    const [selectedCarpark, setSelectedCarpark] = useState(null); // State to store the selected carpark's data
+    const [foundCarparkNumber, setFoundCarparkNumber] = useState(null); // Store the carpark number from /api/carpark
+    const [carparkNumber, setCarparkNumber] = useState(''); // State to store the carpark number
+    const [loading, setLoading] = useState(false);
+
 
     // Function to handle carpark button click
     const handleCarparkClick = () => {
-        setShowCarpark(!showCarpark); // Toggle the carpark modal visibility
+        // Toggle the carpark modal visibility
+        setShowCarpark(!showCarpark);
+        handleNearestCarpark();
     };
 
     // Function to close the carpark modal
     const closeModal = () => {
         setShowCarpark(false); // Set the modal visibility to false
     };
-    
+
     const handleNearestCarpark = async () => {
         try {
-          const response = await axios.get('/api/carpark/nearest', {
-            params: {
-              lat: newLocationLat,
-              lng: newLocationLng,
-            },
-          });
-      
-          // Assuming response.data contains the array of JSON objects
-          const carparks = response.data;
-      
-          // Log or use the data as needed
-          console.log("Nearest carparks:", carparks);
-      
-          // Return the array of JSON objects
-          return carparks;
+            //Step 1: Fetch the nearest carpark based on the new location
+            const response = await axios.get('/api/carpark/nearest', {
+                params: {
+                    lat: newLocationLat,
+                    lng: newLocationLng,
+                },
+            });
+
+            const carparks = response.data;
+            setCarparkNumber(response.data.carpark_no); // Set the carpark number
+            setFoundCarparkNumber(response.data.carpark_no); // Store the found carpark number
+
+            // Step 2: Fetch carpark availability by carpark number
+            const responseAvailability = await axios.get('/api/carpark-availability');
+            const carparkData = responseAvailability.data.items[0].carpark_data;
+
+            // Find the carpark availability for the fetched carpark number
+            const foundCarpark = carparkData.find(carpark => carpark.carpark_number.trim().toLowerCase() === carparkNumber.trim().toLowerCase());
+
+            if (foundCarpark) {
+                setSelectedCarpark(foundCarpark); // Set the found carpark
+            } else {
+                setSelectedCarpark(null); // If not found, reset
+            }
+
         } catch (error) {
-          console.error("Error fetching nearest carpark:", error);
-          // Return an empty array or handle error appropriately
-          return [];
+            console.error("Error fetching nearest carpark:", error);
+        } finally {
+            setLoading(false);
         }
-      };
+    };
 
     // Geocoding function
     const geocodePostalCode = async (postalCode) => {
@@ -111,7 +127,7 @@ const RunnerBoard = () => {
     const handleCompletedJob = async () => {
         try {
             const response = await axios.get('/api/user/jobCompleted', {
-                params:{
+                params: {
                     username: decodedtoken.username,
                 }
             });
@@ -199,11 +215,11 @@ const RunnerBoard = () => {
                         width: '100%', // Make button full width
                     }}>
                     <span style={{
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    color: '#333'
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        color: '#333'
                     }}>
-                    Completed Job
+                        Completed Job
                     </span>
                 </button>
             </div>
@@ -246,23 +262,6 @@ const RunnerBoard = () => {
                 >
                     <FontAwesomeIcon icon={faCar} style={{ color: 'black' }} /> {/* Car icon */}
                 </button>
-                <button
-                    onClick={handleNearestCarpark}
-                    style={{
-                        fontSize: '24px',
-                        background: '#f0f0f0', // Light grey background
-                        border: '2px solid #ccc', // Add a visible border
-                        borderRadius: '50%', // Make it circular
-                        padding: '10px', // Add padding around the icon
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 10
-                    }}
-                >
-                    <FontAwesomeIcon icon={faCar} style={{ color: 'blue' }} /> {/* Car icon */}
-                </button>
             </div>
 
             {/* Modal for carpark availability */}
@@ -301,7 +300,19 @@ const RunnerBoard = () => {
                     >
                         X
                     </button>
-                    <CarparkAvailability />
+                    <h2>Carpark Availability</h2>
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : selectedCarpark ? (
+                        <div>
+                            <h3>Carpark Information</h3>
+                            <p>Carpark Number: {selectedCarpark.carpark_number}</p>
+                            <p>Last Updated: {selectedCarpark.update_datetime}</p>
+                            <p>Capacity: {selectedCarpark.carpark_info?.[0]?.lots_available || 'N/A'}</p> {/* Accessing the first element in carpark_info for capacity */}
+                        </div>
+                    ) : foundCarparkNumber && (
+                        <p>No availability found for carpark number: {foundCarparkNumber}</p>
+                    )}
                 </div>
             )}
 

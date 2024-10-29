@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
+const proj4 = require('proj4');
 
 const csv = require('csv-parser');
 const fs = require('fs');
@@ -233,7 +234,7 @@ app.get('/api/carpark-availability', async (req, res) => {
   try {
     // Fetch data from the Data.gov.sg API
     const response = await axios.get('https://api.data.gov.sg/v1/transport/carpark-availability');
-
+    console.log('Fetched carpark availability data');
     // Send the data to the frontend
     res.json(response.data);
   } catch (error) {
@@ -242,28 +243,42 @@ app.get('/api/carpark-availability', async (req, res) => {
   }
 });
 
+//Lat Long to SVY21
+function latLonToSVY21(lat, lon) {
+  const WGS84 = 'EPSG:4326';
+  const SVY21 = '+proj=tmerc +lat_0=1.366666 +lon_0=103.833333 '
+             + '+k=1 +x_0=28001.642 +y_0=38744.572 '
+             + '+ellps=WGS84 +units=m +no_defs';
+
+  return proj4(WGS84, SVY21, [lon, lat]);
+}
+
 app.get('/api/carpark/nearest', async (req, res) => {
   try {
     // Retrieve latitude and longitude from query parameters
     const { lat, lng } = req.query;
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lng);
+    console.log('Latitude:', latitude, 'Longitude:', longitude);
+    
+    const [userEasting, userNorthing] = latLonToSVY21(latitude, longitude);
+    console.log('User SVY21 Easting:', userEasting, 'Northing:', userNorthing);
+
 
     // Fetch all carparks from the database
     const carparks = await Carpark.find({});
-
     // Calculate distances and find the nearest carpark
     let nearestCarpark = null;
     let minDistance = Infinity;
 
     carparks.forEach(carpark => {
       // Convert carpark's coordinates to floats
-      const carparkLat = parseFloat(carpark.x_coord);
-      const carparkLng = parseFloat(carpark.y_coord);
+      const carparkEasting = parseFloat(carpark.x_coord);
+      const carparkNorthing = parseFloat(carpark.y_coord);
 
       // Calculate Euclidean distance using Pythagorean theorem
       const distance = Math.sqrt(
-        Math.pow(carparkLat - latitude, 2) + Math.pow(carparkLng - longitude, 2)
+        Math.pow(carparkEasting - userEasting, 2) + Math.pow(carparkNorthing - userNorthing, 2)
       );
 
       // Update nearest carpark if the current one is closer
@@ -291,6 +306,7 @@ app.get('/api/carpark/nearest', async (req, res) => {
       },
       address: nearestCarpark.address,
       distance: minDistance,
+      carpark_no: nearestCarpark.car_park_no,
     });
   } catch (error) {
     console.error("Error fetching nearest carpark:", error);
