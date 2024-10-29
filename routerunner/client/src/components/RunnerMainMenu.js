@@ -19,7 +19,7 @@ const RunnerBoard = () => {
     const [foundCarparkNumber, setFoundCarparkNumber] = useState(null); // Store the carpark number from /api/carpark
     const [carparkNumber, setCarparkNumber] = useState(''); // State to store the carpark number
     const [loading, setLoading] = useState(false);
-
+    const [carparkAdd, setCarparkAdd] = useState('');
 
     // Function to handle carpark button click
     const handleCarparkClick = () => {
@@ -46,7 +46,7 @@ const RunnerBoard = () => {
             const carparks = response.data;
             setCarparkNumber(response.data.carpark_no); // Set the carpark number
             setFoundCarparkNumber(response.data.carpark_no); // Store the found carpark number
-
+            setCarparkAdd(response.data.address); // Set the carpark address
             // Step 2: Fetch carpark availability by carpark number
             const responseAvailability = await axios.get('/api/carpark-availability');
             const carparkData = responseAvailability.data.items[0].carpark_data;
@@ -306,6 +306,7 @@ const RunnerBoard = () => {
                     ) : selectedCarpark ? (
                         <div>
                             <h3>Carpark Information</h3>
+                            <p>Carpark Address: {carparkAdd}</p>
                             <p>Carpark Number: {selectedCarpark.carpark_number}</p>
                             <p>Last Updated: {selectedCarpark.update_datetime}</p>
                             <p>Capacity: {selectedCarpark.carpark_info?.[0]?.lots_available || 'N/A'}</p> {/* Accessing the first element in carpark_info for capacity */}
