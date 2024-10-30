@@ -44,11 +44,12 @@ const App = () => {
             <Route path="/viewrunner/:username" element={<ProtectedRoute element={ViewRunner} allowedUsertype="operator"/>} />
             <Route path="/historylogs" element={<ProtectedRoute element={HistoryLogs} allowedUsertype="operator" />} />
             <Route path="resetpassword/:username" element={<ProtectedRoute element={ResetPassword} allowedUsertype="operator" />} />
+            {/* <Route path="/viewjobs/:username" element={<ProtectedRoute element={ViewJobs} allowedUsertype="operator"/>}/> */}
 
             {/* Runner Routes */}
             <Route path="/rmm/:userID" element={<ProtectedRoute element={RunnerMainMenu} allowedUsertype="runner" />} />
             <Route path="/viewcarpark" element={<ProtectedRoute element={ViewCarparkAvailability} allowedUsertype="runner" />} />
-            <Route path="/viewjobs" element={<ProtectedRoute element={ViewJobs} allowedUsertype="runner" />} />
+            <Route path="/viewjobs/:username" element={<ProtectedRoute element={ViewJobs} allowedUsertype={["runner", "operator"]} />} />
           </Route>
         </Routes>
       </div>

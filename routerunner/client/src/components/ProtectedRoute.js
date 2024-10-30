@@ -22,7 +22,7 @@ const ProtectedRoute = ({ element: Component, allowedUsertype, ...rest }) => {
         }
 
         // Check if usertype matches
-        if (decodedToken.usertype === allowedUsertype) {
+        if (allowedUsertype.includes(decodedToken.usertype)) {
             // If usertype matches, render the protected component
             return <Component {...rest} />;
         } else {

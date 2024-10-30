@@ -38,7 +38,7 @@ const BurgerMenu = () => {
           {usertype === 'runner' && (
             <>
               <li><Link to={`/rmm/${username}`}>Home</Link></li>
-              <li><Link to="/viewjobs">View Jobs</Link></li>
+              <li><Link to={`/viewjobs/${username}`}>View Jobs</Link></li>
               <li><button onClick={handleLogout}>Logout</button></li>
             </>
           )}
