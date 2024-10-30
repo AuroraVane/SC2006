@@ -35,6 +35,7 @@ const ManageJobs = () => {
         <table>
           <thead>
             <tr>
+              <th>Job ID</th>
               <th>Username</th>
               <th>Status</th>
             </tr>
@@ -42,6 +43,11 @@ const ManageJobs = () => {
           <tbody>
             {jobs.map((job) => (
               <tr key={job._id} className="job-item">
+                <td>
+                  <Link to={`/viewjobs/${job.runnerUsername}`} className="job-link">
+                    {job.jobID}
+                  </Link>
+                </td>
                 <td>
                   <Link to={`/viewjobs/${job.runnerUsername}`} className="job-link">
                     {job.runnerUsername}
