@@ -1,2 +1,4 @@
 ./routerunner/client/node_modules
 ./routerunner/server/node_modules
+
+*.DS_Store
