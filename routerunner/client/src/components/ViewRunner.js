@@ -32,15 +32,6 @@ const ViewRunner = () => {
       username: username,
       lastLocation: lastlocation,
       currentDestination: newLocation,
-      otherLocations: [
-        { id: '1', name: 'Location C' },
-        { id: '2', name: 'Location D' },
-        { id: '3', name: 'Location E' },
-        { id: '4', name: 'Location F' },
-        { id: '5', name: 'Location G' },
-        { id: '6', name: 'Location H' },
-        { id: '7', name: 'Location I' },
-      ],
     };
 
     const fetchRunnerData = async () => {
@@ -84,20 +75,6 @@ const ViewRunner = () => {
       <h1>Runner Details: {runnerData.username}</h1>
       <p>Last Location: {runnerData.lastLocation}</p>
       <p>Current Destination: {runnerData.currentDestination}</p>
-      <h3>Location List:</h3>
-      <div className="location-list-container">
-        <ul>
-          {runnerData.otherLocations.map((location) => (
-            <li key={location.id} className="location-item">
-              {location.name}
-              <Link to={`/viewjobdetails/${location.id}`}>
-                <button className="view-job-button">View Job Details</button>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
       <div className="button-group">
         <Link to = {`/resetpassword/${username}`}>
           <button className="resetpassword-button" onClick>
