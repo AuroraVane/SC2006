@@ -414,6 +414,16 @@ app.post('/api/jobs', async (req, res) => {
   }
 });
 
+app.get('/api/joblist', async (req, res) => {
+  try {
+    const joblist  = await Job.find({status: ['waiting', 'ongoing']});
+    res.json(joblist);
+    } catch (error) {
+    console.error('Error fetching job list: ', error);
+    res.status(500).json({message: 'Error fetching job list'});ß
+  }
+})
+
 // ==================== END API ENDPOINTS ====================
 
 // ==================== RunnerOperator ====================
