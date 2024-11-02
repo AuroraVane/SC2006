@@ -47,15 +47,23 @@ const RunnerBoard = () => {
             setCarparkNumber(response.data.carpark_no); // Set the carpark number
             setFoundCarparkNumber(response.data.carpark_no); // Store the found carpark number
             setCarparkAdd(response.data.address); // Set the carpark address
+
             // Step 2: Fetch carpark availability by carpark number
-            const responseAvailability = await axios.get('/api/carpark-availability');
-            const carparkData = responseAvailability.data.items[0].carpark_data;
+            (async () => {
+                try {
+                    await axios.put('/api/carpark-availability/update');
+                    console.log('Update successful');
+                } catch (error) {
+                    console.error('Error updating carpark availability:', error);
+                }
+            })();
 
-            // Find the carpark availability for the fetched carpark number
-            const foundCarpark = carparkData.find(carpark => carpark.carpark_number.trim().toLowerCase() === carparkNumber.trim().toLowerCase());
+            console.log(carparkNumber);
+            const responseAvailability = await axios.get(`/api/carpark-availability/get/${carparkNumber}`);
+            const carparkData = responseAvailability.data;
 
-            if (foundCarpark) {
-                setSelectedCarpark(foundCarpark); // Set the found carpark
+            if (carparkData) {
+                setSelectedCarpark(carparkData); // Set the found carpark
             } else {
                 setSelectedCarpark(null); // If not found, reset
             }
@@ -309,7 +317,8 @@ const RunnerBoard = () => {
                             <p>Carpark Address: {carparkAdd}</p>
                             <p>Carpark Number: {selectedCarpark.carpark_number}</p>
                             <p>Last Updated: {selectedCarpark.update_datetime}</p>
-                            <p>Capacity: {selectedCarpark.carpark_info?.[0]?.lots_available || 'N/A'}</p> {/* Accessing the first element in carpark_info for capacity */}
+                            <p>Total Capacity: {selectedCarpark.carpark_info?.[0]?.total_lots || 'N/A'}</p> 
+                            <p>Current Capacity: {selectedCarpark.carpark_info?.[0]?.lots_available || 'N/A'}</p>
                         </div>
                     ) : foundCarparkNumber && (
                         <p>No availability found for carpark number: {foundCarparkNumber}</p>
