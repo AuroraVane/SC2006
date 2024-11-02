@@ -80,7 +80,7 @@ app.post('/api/register', async (req, res) => {
   if (errors.length > 0) {
     return res.status(400).json({ errors });
   }
-
+  console.log('No errors');
   try {
     // Automatically generate userID
     const lastUser = await User.findOne().sort({ userID: -1 });
@@ -148,13 +148,6 @@ app.post('/api/login', async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: 'Invalid username' });
     }
-
-    // Compare the hashed password
-    /*
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid password' });
-    }*/
 
     // Create JWT token
     const token = jwt.sign(

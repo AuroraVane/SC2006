@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom'; // Import Link here
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 
 const CreateNewRunner = () => {
   const [username, setUsername] = useState('');
@@ -9,11 +11,17 @@ const CreateNewRunner = () => {
   const [errorMessages, setErrorMessages] = useState({}); 
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+  const auth = getAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user
+
+      const idToken = await user.getIdToken();
+
       // Send the registration request to the backend
       const response = await axios.post('http://localhost:5001/api/register', {
         username,
@@ -23,12 +31,12 @@ const CreateNewRunner = () => {
       });
 
       // Handle success
-      setSuccessMessage('User registered successfully! Redirecting to login...');
+      setSuccessMessage('User registered successfully!');
       setErrorMessages({}); // Clear error messages
 
       // Redirect to login page after registration
       setTimeout(() => {
-        navigate('/login');
+        navigate('/mngrnr');
       }, 2000);
     } catch (error) {
       // Handle error
