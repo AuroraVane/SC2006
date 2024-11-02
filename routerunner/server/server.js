@@ -140,23 +140,21 @@ app.post('/api/resetpassword', async (req, res) => {
 
 // POST: Login an existing user
 app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Username and password are required' });
-  }
-
+  const { username, idtoken } = req.body;
+  console.log(username);
   try {
     // Find the user by username
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ email: username });
     if (!user) {
       return res.status(400).json({ message: 'Invalid username' });
     }
 
     // Compare the hashed password
+    /*
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid password' });
-    }
+    }*/
 
     // Create JWT token
     const token = jwt.sign(
