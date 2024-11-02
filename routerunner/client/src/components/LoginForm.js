@@ -23,6 +23,12 @@ const LoginForm = () => {
             const userCredential = await doSignInWithEmailAndPassword(username, password);
             const user = userCredential.user;
             
+            if(!user.emailVerified){
+                setErrorMessage('Please verify your email first.');
+                setIsSigningIn(false);
+                return;
+            }
+
             // Get Firebase ID token
             const idToken = await user.getIdToken();
             // Send the Firebase ID token to your backend to create a JWT

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom'; // Import Link here
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { getAuth } from 'firebase/auth';
 
 const CreateNewRunner = () => {
@@ -20,7 +20,8 @@ const CreateNewRunner = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user
 
-      const idToken = await user.getIdToken();
+      await sendEmailVerification(user);
+      setSuccessMessage('Registration successful! A verification email has been sent. Please verify your email.');
 
       // Send the registration request to the backend
       const response = await axios.post('http://localhost:5001/api/register', {
@@ -31,7 +32,6 @@ const CreateNewRunner = () => {
       });
 
       // Handle success
-      setSuccessMessage('User registered successfully!');
       setErrorMessages({}); // Clear error messages
 
       // Redirect to login page after registration
