@@ -21,7 +21,7 @@ const Carpark = require('./models/Carpark');
 const Job = require('./models/Job');
 const HistoryLogs = require('./models/HistoryLogs')
 const Address = require('./models/Address')
-
+const CarparkAvailability = require('./models/CarparkAvailability');
 // Create an Express App
 const app = express();
 
@@ -240,6 +240,41 @@ app.get('/api/carpark-availability', async (req, res) => {
   } catch (error) {
     console.error('Error fetching carpark availability:', error);
     res.status(500).send('Error fetching carpark data');
+  }
+});
+
+app.put('/api/carpark-availability/update', async (req, res) => {
+  try {
+    // Fetch data from the Data.gov.sg API
+    const response = await axios.get('https://api.data.gov.sg/v1/transport/carpark-availability');
+    const carparkData = response.data.items[0].carpark_data;
+
+    for (const carpark of carparkData) {
+      const { carpark_number, update_datetime, carpark_info } = carpark;
+      await CarparkAvailability.updateOne(
+        { carpark_number },
+        { $set: { update_datetime, carpark_info } },
+        { upsert: true }
+      );
+    }
+    res.status(200).send('Carpark availability updated successfully');
+  } catch (error) {
+    console.error('Error fetching carpark availability:', error);
+    res.status(500).send('Error updating carpark data');
+  }
+});
+
+app.get('/api/carpark-availability/get/:carparkNumber', async (req, res) => {
+  const { carparkNumber } = req.params;
+  try {
+    const carparkAvailability = await CarparkAvailability.findOne({ carpark_number: carparkNumber });
+    if (!carparkAvailability) {
+      return res.status(404).json({ message: 'Carpark availability not found' });
+    }
+    res.json(carparkAvailability);
+  } catch (error) {
+    console.error('Error fetching carpark availability:', error);
+    res.status(500).json({ message: 'Error fetching carpark availability' });
   }
 });
 
