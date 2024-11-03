@@ -3,27 +3,33 @@ import axios from 'axios';
 import GoogleMapComponent from './GoogleMap';
 
 const OperatorMainMenu = () => {
-  const mapRef = useRef(null); // Reference to the Google Map instance
+  const mapRef = useRef(null);
   const [activeRunners, setActiveRunners] = useState([]);
   const [runnerLocations, setRunnerLocations] = useState([]);
   const [runnerLocationsAddress, setRunnerLocationsAddress] = useState([]);
 
-  // Function to create markers on the map with different colors
-  const createMarker = (lat, lng, color) => {
+  // Function to create markers on the map with different colors and labels positioned above the marker
+  const createMarker = (lat, lng, color, label) => {
     if (mapRef.current && window.google?.maps?.Marker) {
       new window.google.maps.Marker({
         position: { lat, lng },
-        map: mapRef.current, // Make sure we are passing the correct map instance
+        map: mapRef.current,
         icon: {
-          url: `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png` // Set the color for the marker
-        }
+          url: `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`,
+          labelOrigin: new window.google.maps.Point(5, -5), // Position label above the marker
+        },
+        label: {
+          text: label,
+          color: '#000',
+          fontWeight: 'bold',
+          fontSize: '12px',
+        },
       });
     } else {
       console.error('Google Maps Marker not available or map not loaded');
     }
   };
 
-  // Function to geocode postal codes into lat/lng
   const geocodePostalCode = async (postalCode) => {
     try {
       const geocoder = new window.google.maps.Geocoder();
@@ -41,7 +47,6 @@ const OperatorMainMenu = () => {
     return null;
   };
 
-  // Fetch active runners and their locations
   useEffect(() => {
     const fetchActiveRunners = async () => {
       try {
@@ -79,6 +84,7 @@ const OperatorMainMenu = () => {
       fetchRunnerLocations();
     }
   }, [activeRunners]);
+
   useEffect(() => {
     const fetchRunnerLocationsAddress = async () => {
       try {
@@ -106,30 +112,28 @@ const OperatorMainMenu = () => {
     fetchRunnerLocationsAddress();
   }, [activeRunners]);
 
-  // Geocode postal codes and create markers
   useEffect(() => {
     const createMarkersForLocations = async () => {
-      const colors = ['red', 'blue', 'green', 'purple', 'yellow']; // Define a set of colors
+      const colors = ['red', 'blue', 'green', 'purple', 'yellow'];
       for (const [index, runner] of runnerLocations.entries()) {
         const lastLoc = await geocodePostalCode(runner.lastlocation);
         const newLoc = await geocodePostalCode(runner.newlocation);
-        const color = colors[index % colors.length]; // Cycle through colors
+        const color = colors[index % colors.length];
 
         if (lastLoc) {
-          createMarker(lastLoc.lat, lastLoc.lng, color); // Create marker for last location with color
+          createMarker(lastLoc.lat, lastLoc.lng, color, "Last Location");
         }
         if (newLoc) {
-          createMarker(newLoc.lat, newLoc.lng, color); // Create marker for new location with color
+          createMarker(newLoc.lat, newLoc.lng, color, "Current Destination");
         }
       }
     };
 
     if (runnerLocations.length > 0) {
-      createMarkersForLocations(); // Create markers for all runners
+      createMarkersForLocations();
     }
-  }, [runnerLocations]); // Runs when runnerLocations is updated
+  }, [runnerLocations]);
 
-  
   return (
     <div style={{ position: 'relative', height: '100vh' }}>
       {/* Render the Google Map Component and pass the map reference */}
@@ -149,26 +153,28 @@ const OperatorMainMenu = () => {
         textAlign: 'center',
       }}>
         <h3>Active Runners</h3>
-        <ul style={{ listStyleType: 'none', padding: 0, }}>
+        <ul style={{ listStyleType: 'none', padding: 0 }}>
           {activeRunners.map((runner, index) => (
-            <><button 
-              onClick = {() => { window.location.href = `/viewrunner/${runner.username}`}}
+            <button 
+              onClick={() => { window.location.href = `/viewrunner/${runner.username}` }}
               style={{
                 margin: '7px 0',
-                display: 'flex',               // Flexbox for alignment
-                alignItems: 'center',           // Center content vertically
-                justifyContent: 'center',       // Center content horizontally
-                width: '100%',                  // Full width
-                padding: '15px 10px',           // Padding for spacing
+                display: 'flex',              
+                alignItems: 'center',         
+                justifyContent: 'center',      
+                width: '100%',                
+                padding: '15px 10px',         
                 backgroundColor: '#fff',
                 borderRadius: '5px',
                 boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
-                border: 'none',                 // Remove border
-                cursor: 'pointer',              // Pointer cursor
-                textAlign: 'center',            // Center text inside
-                fontSize: '16px',               // Font size for readability
-                color: '#333'  , 
-            }}>{runner.username}: {runnerLocationsAddress[index]?.lastlocation || 'Loading...'}</button></>
+                border: 'none',               
+                cursor: 'pointer',            
+                textAlign: 'center',          
+                fontSize: '16px',             
+                color: '#333', 
+            }}>
+              {runner.username}: {runnerLocationsAddress[index]?.lastlocation || 'Loading...'}
+            </button>
           ))}
         </ul>
       </div>
