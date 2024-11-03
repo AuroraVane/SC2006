@@ -3,51 +3,68 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { parseJwt } from '../utils/jwtUtils';
+import { doSignInWithEmailAndPassword } from '../firebase/auth'; // Import Firebase functions
+import { getAuth } from 'firebase/auth';
+
 const LoginForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [isSigningIn, setIsSigningIn] = useState(false);
     const navigate = useNavigate();
+    const auth = getAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSigningIn(true);
 
         try {
-            // Make a POST request to the backend login API
+            // Use Firebase to authenticate the user
+            const userCredential = await doSignInWithEmailAndPassword(username, password);
+            const user = userCredential.user;
+            
+            if(!user.emailVerified){
+                setErrorMessage('Please verify your email first.');
+                setIsSigningIn(false);
+                return;
+            }
+
+            // Get Firebase ID token
+            const idToken = await user.getIdToken();
+            // Send the Firebase ID token to your backend to create a JWT
             const response = await axios.post('http://localhost:5001/api/login', {
                 username,
-                password,
+                idToken, // Send the Firebase token to backend
             });
 
             // If login is successful
             console.log('Login successful:', response.data);
-            console.log('User type:', response.data.userType);
             const token = response.data.token;
 
             if (token) {
-                // Store the token in local storage
-
+                // Store the JWT token in local storage
                 localStorage.setItem('token', token);
                 const decodedToken = parseJwt(token);
                 const userType = decodedToken.usertype;
 
                 console.log('User type:', userType);
-                // Redirect based on login success
+                
+                // Redirect based on user type
                 if (userType === 'operator'){
                     navigate(`/omm/${username}`);
-                }
-                else if (userType === 'runner'){
+                } else if (userType === 'runner'){
                     navigate(`/rmm/${username}`);
                 }
             }
-            // Redirect based on login success
         } catch (error) {
             // Handle error cases
             if (error.response && error.response.data.message) {
                 setErrorMessage(error.response.data.message);
             } else {
-                setErrorMessage('Error logging in, please try again.');
+                setErrorMessage(error.message || 'Error logging in, please try again.');
             }
+        } finally {
+            setIsSigningIn(false);
         }
     };
 
@@ -56,7 +73,7 @@ const LoginForm = () => {
             <h2>Login</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Username:</label>
+                    <label>Email: </label>
                     <input
                         type="text"
                         value={username}
@@ -65,7 +82,7 @@ const LoginForm = () => {
                     />
                 </div>
                 <div>
-                    <label>Password:</label>
+                    <label>Password: </label>
                     <input
                         type="password"
                         value={password}
@@ -74,7 +91,7 @@ const LoginForm = () => {
                     />
                 </div>
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
-                <button type="submit">Login</button>
+                <button type="submit" disabled={isSigningIn}>Login</button>
             </form>
         </div>
     );

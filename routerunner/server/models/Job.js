@@ -2,21 +2,26 @@ const mongoose = require('mongoose');
 
 // Define a Mongoose Schema for the HDB Carpark CSV data
 const jobSchema = new mongoose.Schema({
-    jobID : Number,
-    startAddress: {
+    jobID : { type: Number, required: false, unique: false },
+    address: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Address'
+        ref: 'Address',
+        required: false,
+        unique: false,
     },
-    endAddress: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Address'
+    runnerUsername: {
+        type: String,
+        required: false,
+        unique: false,
+        default: 'null',
     },
-    runner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+    note: { type: String, required: false, unique: false},
+    priority: { type: Boolean, required: false, unique: false},
+    status: { 
+        type: String, 
+        enum: ['waiting', 'ongoing', 'completed'], 
+        required: false 
     },
-    status: Boolean,
 });
 
-// Export the Carpark model
 module.exports = mongoose.model('Job', jobSchema);

@@ -221,11 +221,13 @@ button:hover {
   margin-bottom: 20px;
 }
 
+.job-list-containter,
 .runner-list-container ul {
   list-style-type: none;
   padding: 0;
 }
 
+.job-item
 .runner-item {
   padding: 8px; 
 }
@@ -234,6 +236,7 @@ button:hover {
   background-color: #f0f0f0;
 }
 
+.job-link,
 .runner-link {
   display: flex;
   justify-content: space-between;
@@ -281,7 +284,7 @@ button:hover {
   background-color: #0056b3;
 }
 
-.reroute-button,
+.resetpassword-button,
 .delete-button,
 .back-button {
   margin-top: 20px; 
@@ -295,8 +298,63 @@ button:hover {
   font-size: 1rem; 
 }
 
-.reroute-button:hover,
+.resetpassword-button:hover,
 .delete-button:hover,
 .back-button:hover {
   background-color: #0056b3; 
+}
+
+.job-description {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  max-width: 600px;
+  margin: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.job-title {
+  color: #333;
+}
+
+.job-id {
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+
+.address-box {
+  border: 1px solid #007bff;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #e7f3ff;
+  margin-top: 20px;
+}
+
+.job-meta {
+  margin-top: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+table {
+  width: 100%; /* Optional: makes the table full-width */
+  border-collapse: collapse; /* Optional: removes space between cells */
+}
+
+th, td {
+  text-align: center; /* Centers text in header and data cells */
+  padding: 10px; /* Adds some padding for better spacing */
+  border: 1px solid #ccc; /* Optional: adds borders to cells */
+}
+
+.centered {
+  text-align: center; /* Ensures centered alignment for specific cells */
 }

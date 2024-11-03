@@ -9,7 +9,7 @@ import NotFound from './components/NotFound';
 import ViewJobDetails from './components/ViewJobDetails';
 import OperatorMainMenu from './components/OperatorMainMenu';
 import ManageJobs from './components/ManageJobs';
-import ManageRunner from './components/ManageRunner';
+import ManageRunner from './components/ManageRunners';
 import CreateNewRunner from './components/CreateNewRunner';
 import HistoryLogs from './components/HistoryLogs';
 import ViewRunner from './components/ViewRunner';
@@ -17,6 +17,7 @@ import CreateNewJob from './components/CreateNewJob';
 import RunnerMainMenu from './components/RunnerMainMenu';
 import ViewCarparkAvailability from './components/ViewCarparkAvailability';
 import ViewJobs from './components/ViewJobs';
+import ResetPassword from './components/ResetPassword';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -40,13 +41,15 @@ const App = () => {
             <Route path="/mngrnr" element={<ProtectedRoute element={ManageRunner} allowedUsertype="operator" />} />
             <Route path="/createnewrunner" element={<ProtectedRoute element={CreateNewRunner} allowedUsertype="operator" />} />
             <Route path="/createnewjob" element={<ProtectedRoute element={CreateNewJob} allowedUsertype="operator" />} />
-            <Route path="/viewrunner/:userID" element={<ProtectedRoute element={ViewRunner} allowedUsertype="operator" />} />
+            <Route path="/viewrunner/:username" element={<ProtectedRoute element={ViewRunner} allowedUsertype="operator"/>} />
             <Route path="/historylogs" element={<ProtectedRoute element={HistoryLogs} allowedUsertype="operator" />} />
+            <Route path="resetpassword/:username" element={<ProtectedRoute element={ResetPassword} allowedUsertype="operator" />} />
+            {/* <Route path="/viewjobs/:username" element={<ProtectedRoute element={ViewJobs} allowedUsertype="operator"/>}/> */}
 
             {/* Runner Routes */}
             <Route path="/rmm/:userID" element={<ProtectedRoute element={RunnerMainMenu} allowedUsertype="runner" />} />
             <Route path="/viewcarpark" element={<ProtectedRoute element={ViewCarparkAvailability} allowedUsertype="runner" />} />
-            <Route path="/viewjobs" element={<ProtectedRoute element={ViewJobs} allowedUsertype="runner" />} />
+            <Route path="/viewjobs/:username" element={<ProtectedRoute element={ViewJobs} allowedUsertype={["runner", "operator"]} />} />
           </Route>
         </Routes>
       </div>
