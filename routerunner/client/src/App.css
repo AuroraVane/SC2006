@@ -247,6 +247,7 @@ button:hover {
 
 /* Style Manage Jobs page */
 .MJobs-button {
+  display: inline-block;
   padding: 10px 20px;
   font-size: 16px;
   border: none;
