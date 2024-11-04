@@ -18,7 +18,7 @@ const RunnerBoard = () => {
     const [selectedCarpark, setSelectedCarpark] = useState(null); // State to store the selected carpark's data
     const [foundCarparkNumber, setFoundCarparkNumber] = useState(null); // Store the carpark number from /api/carpark
     const [carparkNumber, setCarparkNumber] = useState(''); // State to store the carpark number
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true); // State to store loading status
     const [carparkAdd, setCarparkAdd] = useState('');
 
     // Function to handle carpark button click
@@ -42,8 +42,6 @@ const RunnerBoard = () => {
                     lng: newLocationLng,
                 },
             });
-
-            const carparks = response.data;
             setCarparkNumber(response.data.carpark_no); // Set the carpark number
             setFoundCarparkNumber(response.data.carpark_no); // Store the found carpark number
             setCarparkAdd(response.data.address); // Set the carpark address
@@ -58,8 +56,8 @@ const RunnerBoard = () => {
                 }
             })();
 
-            console.log(carparkNumber);
-            const responseAvailability = await axios.get(`/api/carpark-availability/get/${carparkNumber}`);
+            console.log(response.data.carpark_no);
+            const responseAvailability = await axios.get(`/api/carpark-availability/get/${response.data.carpark_no}`);
             const carparkData = responseAvailability.data;
 
             if (carparkData) {
