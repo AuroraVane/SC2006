@@ -6,10 +6,10 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
 const proj4 = require('proj4');
-
 const csv = require('csv-parser');
 const fs = require('fs');
-
+const admin =  require('firebase-admin');
+const serviceAccount = require('./servicekey/sc2006-1bf92-firebase-adminsdk-5734o-0c7dfbf991.json'); // Adjust the path
 
 const jwt = require('jsonwebtoken'); // For token-based authentication (optional, can be added later)
 const authenticateJWT = require('./authenticateJWT'); // Import the middleware function
@@ -24,6 +24,13 @@ const Address = require('./models/Address')
 const CarparkAvailability = require('./models/CarparkAvailability');
 // Create an Express App
 const app = express();
+// Initialise FIrebase Admin SDK
+admin.initializeApp(
+  {
+    credential: admin.credential.cert(serviceAccount),
+    projectId: 'sc2006-1bf92',
+  }
+);
 
 // Use middlewares
 app.use(bodyParser.json());
@@ -48,7 +55,7 @@ app.get('/', (req, res) => {
 
 // POST: Register a new user
 app.post('/api/register', async (req, res) => {
-  const { username, password, email, usertype } = req.body;
+  const { username, password, email, usertype, fbID } = req.body;
 
   // Initialize an array to hold error messages
   const errors = [];
@@ -93,7 +100,8 @@ app.post('/api/register', async (req, res) => {
       usertype,
       email,
       active: false,
-      postalCode: '',
+      lastlocation: '570150',
+      fbID: fbID || false,
     });
 
     await newUser.save();
@@ -173,9 +181,25 @@ app.get('/api/users', authenticateJWT, async (req, res) => {
   }
 });
 
-app.delete('/api/runners/delete:username', async (req, res) => {
-  const { username } = req.params;
+app.delete('/api/runners/deleteuser', async (req, res) => {
+  const { username } = req.query;
   console.log(username);
+  try {
+    const user = await User.findOne({ username: username });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const uid = user.fbID;
+    try {
+      await admin.auth().deleteUser(uid);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ message: 'Error deleting user on fb' });
+    }
+  } catch (error) {
+    console.error('Error fetching user email:', error);
+    res.status(500).json({ message: 'Error fetching user email on mongo1' });
+  } 
   try {
     const deletedRunner = await User.findOneAndDelete({ username:username });
     if (!deletedRunner) {
@@ -187,6 +211,20 @@ app.delete('/api/runners/delete:username', async (req, res) => {
     res.status(500).json({ message: 'Error deleting runner' });
   }
 });
+
+app.get('/api/user/email', async (req, res) => {
+  const { username } = req.query;
+  try {
+    const user = await User.findOne({ username: username });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ email: user.email });
+  } catch (error) {
+    console.error('Error fetching user email:', error);
+    res.status(500).json({ message: 'Error fetching user email' });
+  }
+} );
 
 // ==================== END USER AUTHENTICATION ====================
 

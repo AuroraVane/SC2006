@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { deleteUser, sendPasswordResetEmail,getAuth } from 'firebase/auth';
 
 const ViewRunner = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const ViewRunner = () => {
   const [newLocation, setNewLocation] = useState('');
   const [lastlocation, setLastLocation] = useState('');
   const { username } = useParams();
+  const auth = getAuth();
 
   useEffect(() => {
     const fetchNewLocation = async () => {
@@ -53,15 +55,22 @@ const ViewRunner = () => {
 
   const handleDeleteRunner = async () => {
     try {
-      await axios.delete(`/api/runners/delete${username}`);
+      await axios.delete(`/api/runners/deleteuser`, { params: { username: username } });
       navigate('/mngrnr');
     } catch (error) {
       console.error('Error deleting runner:', error);
     }
   };
 
-
-
+  const handleResetPassword = async () => {
+    try {
+      const response = await axios.get(`/api/user/email`, { params: { username: username } });
+      await sendPasswordResetEmail(auth, response.data.email);
+      alert('Reset password email sent!');
+    } catch (error) {
+      console.error('Error sending reset password email:', error);
+    }
+  };
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -76,11 +85,9 @@ const ViewRunner = () => {
       <p>Last Location: {runnerData.lastLocation}</p>
       <p>Current Destination: {runnerData.currentDestination}</p>
       <div className="button-group">
-        <Link to = {`/resetpassword/${username}`}>
-          <button className="resetpassword-button" onClick>
-            Reset Password
-          </button>
-        </Link>
+        <button className="resetpassword-button" onClick = {handleResetPassword}>
+          Reset Password
+        </button>
         <button className="delete-button" onClick={handleDeleteRunner}>
           Delete Runner
         </button>

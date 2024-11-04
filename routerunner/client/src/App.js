@@ -17,7 +17,6 @@ import CreateNewJob from './components/CreateNewJob';
 import RunnerMainMenu from './components/RunnerMainMenu';
 import ViewCarparkAvailability from './components/ViewCarparkAvailability';
 import ViewJobs from './components/ViewJobs';
-import ResetPassword from './components/ResetPassword';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -43,7 +42,6 @@ const App = () => {
             <Route path="/createnewjob" element={<ProtectedRoute element={CreateNewJob} allowedUsertype="operator" />} />
             <Route path="/viewrunner/:username" element={<ProtectedRoute element={ViewRunner} allowedUsertype="operator"/>} />
             <Route path="/historylogs" element={<ProtectedRoute element={HistoryLogs} allowedUsertype="operator" />} />
-            <Route path="resetpassword/:username" element={<ProtectedRoute element={ResetPassword} allowedUsertype="operator" />} />
             {/* <Route path="/viewjobs/:username" element={<ProtectedRoute element={ViewJobs} allowedUsertype="operator"/>}/> */}
 
             {/* Runner Routes */}

@@ -29,6 +29,7 @@ const CreateNewRunner = () => {
         password,
         email,
         usertype: 'runner',
+        fbID: user.uid,
       });
 
       // Handle success
