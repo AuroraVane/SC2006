@@ -68,7 +68,7 @@ const ManageJobs = () => {
           <button classname = "MJobs-button">Create Job</button>
         </Link>
         <Link to="/historylogs">
-          <button classname = "MJobs-button">History Logs</button>
+          <button classname = "MJobs-button">History Log</button>
         </Link>
       </div>
     </div>
