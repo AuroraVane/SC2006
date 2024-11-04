@@ -85,6 +85,28 @@ button:hover {
   background-color: #0056b3;
 }
 
+.form-group{ /*holding label and input box*/
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-group label{ 
+  width: 80px;
+  height: 18px; 
+  text-align: right;
+  margin-right: 10px; 
+  margin-bottom: 20px;
+}
+
+.form-group input {
+  height: 18px;
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .error-message {
   color: red;
   margin-bottom: 20px;
@@ -192,6 +214,7 @@ button:hover {
   font-size: 16px; /* Increase font size */
   padding: 0;
 }
+
 
 /* Style Manage Runners page */
 .manage-runner-container {
