@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { parseJwt } from '../utils/jwtUtils';
 
 const ViewJobs = () => {
-  const { username } = useParams(); // Extract username from URL parameters
+  const { jobID } = useParams(); // Extract username from URL parameters
   const [jobData, setJobData] = useState([]);
   const token = localStorage.getItem('token');
   const decodedtoken = token ? parseJwt(token) : null;
@@ -13,14 +13,14 @@ const ViewJobs = () => {
 
   useEffect(() => {
     const fetchJobData = async () => {
-      const response = await axios.get('/api/runner-job/', { params: { username } });
+      const response = await axios.get('/api/runner-job/', { params: { jobID } });
       setJobData(response.data);
     };
 
-    if (username) {
+    if (jobID) {
       fetchJobData();
     }
-  }, [username]); // Add username as a dependency
+  }, [jobID]); // Add username as a dependency
 
   return (
     <div className="job-description">
@@ -45,6 +45,7 @@ const ViewJobs = () => {
       </div>
       {usertype === "operator" && (
         <button
+          type="button"
           style={{
             marginTop: '20px',
             padding: '10px 15px',

@@ -58,4 +58,20 @@ test('Create New Job & Delete New Job Test', async ({ page }) => {
     await page.waitForTimeout(500);
 
     await page.click('button[type="button"]');
+
+    await page.waitForTimeout(2000);
+
+    await page.click('label.menu-icon');
+
+    await page.waitForTimeout(500);
+
+    await page.click('li:has-text("Manage Jobs")');
+
+    await page.waitForTimeout(500);
+
+    await page.click('label.menu-icon');
+
+    await page.waitForTimeout(500);
+
+    await page.click('a[href="/viewjobs/null"]');
 });

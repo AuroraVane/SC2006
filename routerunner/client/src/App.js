@@ -47,7 +47,7 @@ const App = () => {
             {/* Runner Routes */}
             <Route path="/rmm/:userID" element={<ProtectedRoute element={RunnerMainMenu} allowedUsertype="runner" />} />
             <Route path="/viewcarpark" element={<ProtectedRoute element={ViewCarparkAvailability} allowedUsertype="runner" />} />
-            <Route path="/viewjobs/:username" element={<ProtectedRoute element={ViewJobs} allowedUsertype={["runner", "operator"]} />} />
+            <Route path="/viewjobs/:jobID" element={<ProtectedRoute element={ViewJobs} allowedUsertype={["runner", "operator"]} />} />
           </Route>
         </Routes>
       </div>

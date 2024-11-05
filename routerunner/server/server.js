@@ -409,10 +409,9 @@ app.get('/api/historylogs', async (req, res) => {
 app.get('/api/runner-job', async (req, res) => {
   try {
     // Get the user's username from the token
-    const username = req.query.username;
+    const jobID = req.query.jobID;
     const job = await Job.findOne({
-      runnerUsername: username,
-      status: 'ongoing'
+      jobID: jobID,
     });
     const jobaddress = await Address.findOne({
       _id: job.address,
@@ -434,6 +433,23 @@ app.get('/api/runner-job', async (req, res) => {
   } catch (error) {
     console.error('Error fetching job:', error);
     res.status(500).json({ message: 'Error fetching job' });
+  }
+})
+
+app.get('/api/get-runner-job', async (req, res) => {
+  try {
+    // Get the user's username from the token
+    const username = req.query.username;
+    const job = await Job.findOne({
+      runnerUsername : username,
+      status: 'ongoing'
+    });
+    res.json({
+      jobID: job.jobID,
+    });
+  } catch (error) {
+    console.error('Error fetching jobID:', error);
+    res.status(500).json({ message: 'Error fetching jobID' });
   }
 })
 // ==================== END API ENDPOINTS ====================

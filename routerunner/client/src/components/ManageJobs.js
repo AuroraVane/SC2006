@@ -44,12 +44,12 @@ const ManageJobs = () => {
             {jobs.map((job) => (
               <tr key={job._id} className="job-item">
                 <td>
-                  <Link to={`/viewjobs/${job.runnerUsername}`} className="job-link">
+                  <Link to={`/viewjobs/${job.jobID}`} className="job-link">
                     {job.jobID}
                   </Link>
                 </td>
                 <td>
-                  <Link to={`/viewjobs/${job.runnerUsername}`} className="job-link">
+                  <Link to={`/viewjobs/${job.jobID}`} className="job-link">
                     {job.runnerUsername}
                   </Link>
                 </td>
