@@ -12,4 +12,30 @@ test('Create New Runner & Delete New Runner Test', async ({ page }) => {
     await page.click('button[type="submit"]'); // Submit login form 
 
     await page.waitForTimeout(500);
+
+    await page.click('label.menu-icon');
+
+    // Step 4: Click on the "Manage Jobs" item in the menu
+    await page.click('li:has-text("Manage Runners")'); // Clicks on the "Manage Jobs" menu item
+    await page.waitForTimeout(500);
+
+    await page.click('a[href="/createnewrunner"]');
+
+    await page.waitForTimeout(500);
+
+    await page.fill('input[type="text"]', 'testrunner');
+
+    await page.waitForTimeout(500);
+
+    await page.fill('input[type="password"]', 'Password123!');
+
+    await page.waitForTimeout(500);
+
+    await page.fill('input[type="email"]', 'gaymingkaismite@gmail.com');
+
+    await page.waitForTimeout(500);
+
+    await page.click('button[type="submit"]');
+
+    await page.waitForTimeout(2000);
 });

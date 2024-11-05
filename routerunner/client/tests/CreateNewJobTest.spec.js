@@ -72,6 +72,4 @@ test('Create New Job & Delete New Job Test', async ({ page }) => {
     await page.click('label.menu-icon');
 
     await page.waitForTimeout(500);
-
-    await page.click('a[href="/viewjobs/null"]');
 });
