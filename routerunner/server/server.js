@@ -544,6 +544,19 @@ app.get('/api/user/location', async (req,res) => {
   }
 });
 
+app.post('/api/user/initialLocation', async (req, res) => {
+  try{
+    const username = req.body.username;
+    const location = req.body.location;
+    const updateUser = await User.updateOne({
+      username: username,
+    }, {$set:{
+      lastlocation: location,
+    }});
+  } catch (error){
+    res.status(500).json({message: 'Error setting initial user location'})
+  }
+})
 
 
 app.get('/api/user/jobCompleted', async (req,res) => {
@@ -551,7 +564,7 @@ app.get('/api/user/jobCompleted', async (req,res) => {
   try {
     const jobcompleted = await Job.findOne({status:'ongoing', runnerUsername:username});
     if (jobcompleted !== null){
-      // if have current job (ongoing -> completed) + log
+      // if have current job (ongoing -> completed) + log + update user
       // update job
       const jobcompletedupdate = await Job.updateOne({
         status: 'ongoing',

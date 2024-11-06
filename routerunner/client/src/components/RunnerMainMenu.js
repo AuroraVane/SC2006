@@ -20,6 +20,8 @@ const RunnerBoard = () => {
     const [carparkNumber, setCarparkNumber] = useState(''); // State to store the carpark number
     const [loading, setLoading] = useState(true); // State to store loading status
     const [carparkAdd, setCarparkAdd] = useState('');
+    const [locationInputVisible, setLocationInputVisible] = useState(false); // For conditional rendering
+    const [initialLocation, setInitialUserLocation] = useState('');  // To store user's new location input
 
     // Function to handle carpark button click
     const handleCarparkClick = () => {
@@ -131,8 +133,6 @@ const RunnerBoard = () => {
     };
 
     const handleCompletedJob = async () => {
-        console.log(lastlocation);
-        console.log(newlocation);
         try {
             const response = await axios.get('/api/user/jobCompleted', {
                 params: {
@@ -157,12 +157,33 @@ const RunnerBoard = () => {
         }
     }
 
+    const handleInitialLocationSubmit = async () => {
+        try {
+            // Assuming you want to update the location on the server
+            const response = await axios.post('/api/user/initialLocation', {
+                username: decodedtoken.username,
+                location: initialLocation
+            });
+            
+            // Update state and hide the input form
+            setLastLocation(initialLocation);
+            setLocationInputVisible(false);
+        } catch (error) {
+            console.error('Error updating location:', error);
+        }
+    };
+
     useEffect(() => {
         const fetchNewLocation = async () => {
             try {
                 const response = await axios.get('/api/user/location', { params: { username: decodedtoken.username } });
                 setLastLocation(response.data.lastlocation); // This will trigger re-render
                 setNewLocation(response.data.newlocation); // This will trigger re-render
+                if (response.data.lastlocation === ''){
+                    setLocationInputVisible(true);
+                } else {
+                    setLocationInputVisible(false);
+                }
             } catch (error) {
                 console.error('Error fetching active runners:', error);
             }
@@ -197,50 +218,62 @@ const RunnerBoard = () => {
         <div>
             <GoogleMapComponent mapRef={mapRef} />
             <div style={{
-                position: 'absolute',
-                bottom: '90px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '200px',
-                backgroundColor: '#fff',
-                borderRadius: '12px',
-                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-                padding: '10px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+            position: 'absolute',
+            bottom: '90px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '200px',
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+            padding: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             }}>
-                <span style={{
+            {locationInputVisible && (
+                <div className="location-input">
+                <h3>Enter your current location:</h3>
+                <input
+                    type="text"
+                    value={initialLocation}
+                    onChange={(e) => setInitialUserLocation(e.target.value)}
+                    placeholder="Enter your location"
+                />
+                <button onClick={handleInitialLocationSubmit}>Submit</button>
+                </div>
+            )}
+            
+            {!locationInputVisible && (
+                <div>
+                <button
+                    onClick={handleCompletedJob}
+                    style={{
+                    fontSize: '24px',
+                    background: '#f0f0f0', // Light grey background
+                    border: '2px solid #ccc', // Visible border
+                    borderRadius: '8px', // Smaller border radius for rectangular button
+                    padding: '10px 20px', // Adjust padding for rectangular shape
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10,
+                    width: '100%', // Full width button
+                    }}>
+                    <span style={{
                     fontSize: '16px',
                     fontWeight: 'bold',
                     color: '#333'
-                }}>
-                </span>
-                <button
-                    onClick={handleCompletedJob} // Corrected the syntax for the onClick handler
-                    style={{
-                        fontSize: '24px',
-                        background: '#f0f0f0', // Light grey background
-                        border: '2px solid #ccc', // Add a visible border
-                        borderRadius: '8px', // Use a smaller border radius for a rectangular button
-                        padding: '10px 20px', // Adjust padding for a more rectangular shape
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 10,
-                        width: '100%', // Make button full width
                     }}>
-                    <span style={{
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        color: '#333'
-                    }}>
-                    {newlocation !== null ? 'Completed Job' : 'Find new job'}
+                    {((newlocation === null) || (newlocation ==='')) ? 'Find new job' : 'Completed Job'}
                     </span>
                 </button>
+                </div>
+            )}
             </div>
+                
 
             <div style={{
                 position: 'absolute',
@@ -282,6 +315,7 @@ const RunnerBoard = () => {
                 </button>
             </div>
 
+            
             {/* Modal for carpark availability */}
             {showCarpark && (
                 <div style={{
