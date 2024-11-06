@@ -131,15 +131,27 @@ const RunnerBoard = () => {
     };
 
     const handleCompletedJob = async () => {
+        console.log(lastlocation);
+        console.log(newlocation);
         try {
             const response = await axios.get('/api/user/jobCompleted', {
                 params: {
                     username: decodedtoken.username,
                 }
             });
-            setLastLocation(newlocation);
-            console.log('Job completed:', String(response.data.postalCode));
-            setNewLocation(String(response.data.postalCode));
+            if(response.data.postalCode === ''){
+                alert("No new jobs available")
+                setNewLocation(String(''))
+            }
+            else {
+                if (newlocation !== ''){
+                    // for repeated no new jobs
+                    setLastLocation(newlocation);
+                } else{
+                    setLastLocation(newlocation);
+                    setNewLocation(String(response.data.postalCode));
+                }
+            }
         } catch (error) {
             console.error('Error fetching new Job:', error);
         }
@@ -225,7 +237,7 @@ const RunnerBoard = () => {
                         fontWeight: 'bold',
                         color: '#333'
                     }}>
-                        Completed Job
+                    {newlocation !== null ? 'Completed Job' : 'Find new job'}
                     </span>
                 </button>
             </div>

@@ -546,48 +546,76 @@ app.get('/api/user/location', async (req,res) => {
 
 
 
-//Test Function
 app.get('/api/user/jobCompleted', async (req,res) => {
   const {username} = req.query;
   try {
-    // await Job.updateMany({}, {$set: {status:'waiting', runnerUsername:'null'}});
     const jobcompleted = await Job.findOne({status:'ongoing', runnerUsername:username});
-    const jobcompletedupdate = await Job.updateOne({
-      status: 'ongoing',
-      runnerUsername: username,
-    }, {$set:{
-      status: 'completed',
-    }});
+    if (jobcompleted !== null){
+      // if have current job (ongoing -> completed) + log
+      // update job
+      const jobcompletedupdate = await Job.updateOne({
+        status: 'ongoing',
+        runnerUsername: username,
+      }, {$set:{
+        status: 'completed',
+      }});
+      // add history logs
+      const timestamp = Date.now();
+      const date = new Date(timestamp);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const formattedDate = `${day}/${month}/${year}`;
+      const newlog = new HistoryLogs({
+        job: jobcompleted._id,
+        date: formattedDate
+      });
+      await newlog.save();
+      // update user
+      const addresscompleted = await Address.findOne({_id: jobcompleted.address});
+      user = await User.updateOne({
+        username: username,
+      }, {$set:{
+        lastlocation: addresscompleted.postalCode,
+        newlocation: ''
+      }})
+    }
 
-    // handle history logs
-    const timestamp = Date.now();
-    const date = new Date(timestamp);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const formattedDate = `${day}/${month}/${year}`;
-    const newlog = new HistoryLogs({
-      job: jobcompleted._id,
-      date: formattedDate
-    });
-    await newlog.save();
-
-    const jobongoingupdate = await Job.updateOne({
+    // search for job
+    // prioritise 
+    jobongoingupdate = await Job.updateOne({
       status: 'waiting',
+      priority: true,
     }, {$set:{
       runnerUsername: username,
       status: 'ongoing'
     }})
-    jobongoing = await Job.findOne({runnerUsername: username, status:'ongoing'})
-    const addresscompleted = await Address.findOne({_id: jobcompleted.address});
-    const addressongoing = await Address.findOne({_id: jobongoing.address});
-    const user = await User.updateOne({
+    if (jobongoingupdate.modifiedCount == 0){
+      jobongoingupdate = await Job.updateOne({
+        status: 'waiting',
+        priority: false,
+      }, {$set:{
+        runnerUsername: username,
+        status: 'ongoing'
+      }})
+    }
+
+    if (jobongoingupdate.modifiedCount == 1){
+      // have new job
+      jobongoing = await Job.findOne({runnerUsername: username, status:'ongoing'});
+      addressongoing = await Address.findOne({_id: jobongoing.address});
+    }
+    else {
+      // no new job
+      addressongoing.postalCode = ''
+    }
+    // update user
+    user = await User.updateOne({
       username: username,
     }, {$set:{
-      lastlocation: addresscompleted.postalCode,
       newlocation: addressongoing.postalCode
     }})
-    res.json({postalCode: addressongoing.postalCode });
+    res.json({postalCode: addressongoing.postalCode});
   }
   catch (error) {
     console.error('Error fetching user location:', error);
