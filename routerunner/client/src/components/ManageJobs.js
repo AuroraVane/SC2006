@@ -63,12 +63,12 @@ const ManageJobs = () => {
       </div>
 
       {/* Buttons to CreateNewJob and HistoryLogs */}
-      <div>
+      <div className = "button-container">
         <Link to="/createnewjob">
-          <button>Create New Job</button>
+          <button classname = "MJobs-button">Create Job</button>
         </Link>
         <Link to="/historylogs">
-          <button>History Logs</button>
+          <button classname = "MJobs-button">History Log</button>
         </Link>
       </div>
     </div>
