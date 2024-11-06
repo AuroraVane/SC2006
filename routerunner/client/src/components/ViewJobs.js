@@ -43,19 +43,22 @@ const ViewJobs = () => {
           <strong>Priority:</strong> {jobData.priority ? 'High' : 'Low'}
         </p>
       </div>
+
       {usertype === "operator" && (
         <button
           type="button"
           style={{
             marginTop: '20px',
             padding: '10px 15px',
-            backgroundColor: '#f44336',
+            backgroundColor: jobData.status === 'waiting' ? '#f44336' : '#cccccc',
             color: 'white',
             border: 'none',
             borderRadius: '5px',
-            cursor: 'pointer'
+            cursor: jobData.status === 'waiting' ? 'pointer' : 'not-allowed',
+            opacity: jobData.status === 'waiting' ? '1' : '0.6'
           }}
-          onClick={() => alert("Delete functionality placeholder")}
+          onClick={() => jobData.status === 'waiting' && alert("Delete functionality placeholder")}
+          disabled={jobData.status !== 'waiting'}
         >
           Delete Job
         </button>

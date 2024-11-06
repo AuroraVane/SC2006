@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom'; // Import Link here
+import { useNavigate, Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { getAuth } from 'firebase/auth';
 
 const CreateNewRunner = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // New state for confirm password
   const [email, setEmail] = useState('');
-  const [errorMessages, setErrorMessages] = useState({}); 
+  const [errorMessages, setErrorMessages] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
   const auth = getAuth();
@@ -16,9 +17,15 @@ const CreateNewRunner = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      setErrorMessages({ confirmPassword: "Passwords do not match" });
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user
+      const user = userCredential.user;
 
       await sendEmailVerification(user);
       setSuccessMessage('Registration successful! A verification email has been sent. Please verify your email.');
@@ -32,7 +39,6 @@ const CreateNewRunner = () => {
         fbID: user.uid,
       });
 
-      // Handle success
       setErrorMessages({}); // Clear error messages
 
       // Redirect to login page after registration
@@ -40,7 +46,6 @@ const CreateNewRunner = () => {
         navigate('/mngrnr');
       }, 2000);
     } catch (error) {
-      // Handle error
       if (error.response && error.response.data.errors) {
         const messages = error.response.data.errors.reduce((acc, message) => {
           if (message.includes('Email')) {
@@ -53,10 +58,9 @@ const CreateNewRunner = () => {
           return acc;
         }, {});
 
-        // Set error messages
         setErrorMessages({
           ...messages,
-          general: undefined, // Clear general error if specific messages are set
+          general: undefined,
         });
       } else {
         setErrorMessages({ general: 'Error registering user. Please try again.' });
@@ -75,7 +79,7 @@ const CreateNewRunner = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            style={{ flex: 1, marginLeft: '10px', marginBottom: '2px' }} // Adjusted to align input
+            style={{ flex: 1, marginLeft: '10px', marginBottom: '2px' }}
           />
         </div>
         {errorMessages.username && (
@@ -97,6 +101,23 @@ const CreateNewRunner = () => {
         {errorMessages.password && (
           <p className="error-message" style={{ fontSize: '12px', color: 'red', margin: '0 0 10px 110px' }}>
             {errorMessages.password}
+          </p>
+        )}
+
+        {/* Confirm Password Field */}
+        <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+          <label style={{ width: '100px' }}>Confirm Password:</label>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            style={{ flex: 1, marginLeft: '10px', marginBottom: '2px' }}
+          />
+        </div>
+        {errorMessages.confirmPassword && (
+          <p className="error-message" style={{ fontSize: '12px', color: 'red', margin: '0 0 10px 110px' }}>
+            {errorMessages.confirmPassword}
           </p>
         )}
 
@@ -139,5 +160,3 @@ const CreateNewRunner = () => {
 };
 
 export default CreateNewRunner;
-
-

@@ -11,7 +11,9 @@ const ViewRunner = () => {
   const [runnerData, setRunnerData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [newLocation, setNewLocation] = useState('');
-  const [lastlocation, setLastLocation] = useState('');
+  const [lastLocation, setLastLocation] = useState('');
+  const [newLocationAddress,setNewLocationAddress] = useState('');
+  const [lastLocationAddress,setLastLocationAddress] = useState('');
   const { username } = useParams();
   const auth = getAuth();
 
@@ -28,12 +30,51 @@ const ViewRunner = () => {
     
     fetchNewLocation();
   }, []);
+
+  useEffect(()=>{
+    //fetch address based on postal code
+    const fetchAddressFromPostalCode = async(postalCode)=>{
+      try{
+        const response = await axios.get("https://www.onemap.gov.sg/api/common/elastic/search", {
+          params:{
+            searchVal: postalCode,
+            returnGeom: 'N',
+            getAddrDetails: 'Y',
+            pageNum: 1
+          },
+        });
+
+        const results = response.data.results;
+        if (results && results.length > 0) {
+          return `${results[0].BLK_NO} ${results[0].ROAD_NAME}`;
+        }
+        return 'Address not found';
+      }catch(error){
+        console.error('Error fetching address:',error);
+        return 'Error fetching address';
+      }
+    };
+    // fetch address for both lastLocation and newLocation
+    const fetchAddresses = async () => {
+      if (lastLocation){
+        const address = await fetchAddressFromPostalCode(lastLocation);
+        setLastLocationAddress(address);
+      }
+      if (newLocation){
+        const address = await fetchAddressFromPostalCode(newLocation);
+        setNewLocationAddress(address);
+      }
+      setLoading(false);
+    };
+    fetchAddresses();
+  },[newLocation, lastLocation]);
+
   useEffect(() => {
     // Temporary runner data for testing
     const tempRunnerData = {
       username: username,
-      lastLocation: lastlocation,
-      currentDestination: newLocation,
+      lastLocation: lastLocationAddress,
+      currentDestination: newLocationAddress,
     };
 
     const fetchRunnerData = async () => {
@@ -51,7 +92,7 @@ const ViewRunner = () => {
     };
 
     fetchRunnerData();
-  }, [newLocation, lastlocation]);
+  }, [newLocationAddress, lastLocationAddress, username]);
 
   const handleDeleteRunner = async () => {
     try {

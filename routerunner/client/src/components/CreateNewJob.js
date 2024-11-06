@@ -1,19 +1,4 @@
 // components/CreateNewJob.js
-/*
-import React from 'react';
-
-const CreateNewJob = () => {
-  return (
-    <div>
-      <h1>Create New Job</h1>
-      <p>This is the placeholder for the Create New Job page.</p>
-    </div>
-  );
-};
-
-
-export default CreateNewJob;
-*/
 
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -28,29 +13,24 @@ const CreateNewJob = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-
   const checkPostalCodeExists = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.get("https://www.onemap.gov.sg/api/common/elastic/search", {
         params: {
-            searchVal: postalCode,
-            returnGeom: 'Y',
-            getAddrDetails: 'Y',
-            pageNum: 1
-          },
-        });
+          searchVal: postalCode,
+          returnGeom: 'Y',
+          getAddrDetails: 'Y',
+          pageNum: 1
+        },
+      });
 
       const results = response.data.results;
       if (results.length > 0) {
-
-        // Extract Street Name and Block Number
-        const streetComponent = results[0]["ROAD_NAME"]
-        const blockComponent = results[0]["BLK_NO"]
-
-        setStreetName(streetComponent ? streetComponent: 'N/A');
-        setBlockNumber(blockComponent ? blockComponent : 'N/A');
+        const streetComponent = results[0]["ROAD_NAME"];
+        const blockComponent = results[0]["BLK_NO"];
+        setStreetName(streetComponent || 'N/A');
+        setBlockNumber(blockComponent || 'N/A');
         setError(null);
       } else {
         setStreetName('N/A');
@@ -64,9 +44,8 @@ const CreateNewJob = () => {
   };
 
   const handleAddJob = async () => {
-    // startAddress & runner on hold, await viewRunner/viewJob, right now is just tmp values
     const job = {
-      jobID: Date.now()%100000000000,
+      jobID: Date.now() % 100000000000,
       address: {
         postalCode: postalCode,
         street: streetName,
@@ -80,7 +59,7 @@ const CreateNewJob = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:5001/api/jobs', job); // Replace with your API endpoint
+      const response = await axios.post('http://localhost:5001/api/jobs', job);
       console.log('Job added:', response.data);
       setSuccess('Job successfully created!');
       setError(null);
@@ -91,93 +70,112 @@ const CreateNewJob = () => {
     }
   };
 
+  const containerStyle = {
+    maxWidth: '600px',
+    margin: '0 auto',
+    padding: '20px',
+    border: '1px solid #ddd',
+    borderRadius: '8px',
+    backgroundColor: '#f9f9f9',
+    boxSizing: 'border-box',
+  };
+
+  const inputStyle = {
+    width: 'calc(100% - 16px)', // ensures consistent gap inside the container
+    padding: '8px',
+    marginBottom: '10px',
+    borderRadius: '4px',
+    border: '1px solid #ccc',
+  };
+
+  const labelStyle = {
+    display: 'block',
+    marginBottom: '5px',
+    fontWeight: 'bold',
+  };
+
   return (
-    <div>
-      <h1>Create New Job</h1>
+    <div style={containerStyle}>
+      <h1 style={{ textAlign: 'center' }}>Create New Job</h1>
       <form onSubmit={checkPostalCodeExists}>
         <div>
-          <label>
-            Postal Code:
-            <input
-              type="text"
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-              placeholder="Enter postal code"
-              required
-            />
-          </label>
-          <button type="submit">Check Postal Code</button>
+          <label style={labelStyle}>Postal Code:</label>
+          <input
+            type="text"
+            value={postalCode}
+            onChange={(e) => setPostalCode(e.target.value)}
+            placeholder="Enter postal code"
+            required
+            style={inputStyle}
+          />
+          <button type="submit" style={{ width: '100%', padding: '10px', marginBottom: '10px' }}>Check Postal Code</button>
         </div>
 
         <div>
-          <label>
-            Street Name:
-            <input
-              type="text"
-              value={streetName}
-              readOnly
-              placeholder="Street Name will autofill"
-            />
-          </label>
+          <label style={labelStyle}>Street Name:</label>
+          <input
+            type="text"
+            value={streetName}
+            readOnly
+            placeholder="Street Name will autofill"
+            style={inputStyle}
+          />
         </div>
 
         <div>
-          <label>
-            Block Number:
-            <input
-              type="text"
-              value={blockNumber}
-              readOnly
-              placeholder="Block Number will autofill"
-            />
-          </label>
+          <label style={labelStyle}>Block Number:</label>
+          <input
+            type="text"
+            value={blockNumber}
+            readOnly
+            placeholder="Block Number will autofill"
+            style={inputStyle}
+          />
         </div>
 
         <div>
-          <label>
-            Floor and Apartment [optional]:
-            <input
-              type="text"
-              value={unitNumber}
-              onChange={(e) => setUnitNumber(e.target.value)}
-              placeholder="Enter unit number"
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Notes [optional]:
-            <input
-              type="text"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Enter note"
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Priority:
-            <input
-              type="checkbox"
-              checked={priority}
-              onChange={() => setPriority(!priority)}
-            />
-          </label>
+          <label style={labelStyle}>Floor and Apartment [optional]:</label>
+          <input
+            type="text"
+            value={unitNumber}
+            onChange={(e) => setUnitNumber(e.target.value)}
+            placeholder="Enter unit number"
+            style={inputStyle}
+          />
         </div>
 
-        <button type="button" onClick={handleAddJob}>
+        <div>
+          <label style={labelStyle}>Notes [optional]:</label>
+          <input
+            type="text"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Enter note"
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={labelStyle}>Priority:</label>
+          <input
+            type="checkbox"
+            checked={priority}
+            onChange={() => setPriority(!priority)}
+            style={{ marginBottom: '10px' }}
+          />
+        </div>
+
+        <button type="button" onClick={handleAddJob} style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
           Create Job
         </button>
       </form>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
+      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+      {success && <p style={{ color: 'green', textAlign: 'center' }}>{success}</p>}
     </div>
   );
 };
 
 export default CreateNewJob;
-
 
 
