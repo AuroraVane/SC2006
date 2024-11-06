@@ -617,18 +617,24 @@ app.get('/api/user/jobCompleted', async (req,res) => {
       // have new job
       jobongoing = await Job.findOne({runnerUsername: username, status:'ongoing'});
       addressongoing = await Address.findOne({_id: jobongoing.address});
+      // update user
+      user = await User.updateOne({
+        username: username,
+      }, {$set:{
+        newlocation: addressongoing.postalCode
+      }})
+      res.json({postalCode: addressongoing.postalCode})
     }
-    else {
+    else{
       // no new job
-      addressongoing.postalCode = ''
+      // update user
+      user = await User.updateOne({
+        username: username,
+      }, {$set:{
+        newlocation: ''
+      }})
+      res.json({postalCode: ''})
     }
-    // update user
-    user = await User.updateOne({
-      username: username,
-    }, {$set:{
-      newlocation: addressongoing.postalCode
-    }})
-    res.json({postalCode: addressongoing.postalCode});
   }
   catch (error) {
     console.error('Error fetching user location:', error);
