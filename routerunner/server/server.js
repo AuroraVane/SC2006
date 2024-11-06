@@ -100,7 +100,8 @@ app.post('/api/register', async (req, res) => {
       usertype,
       email,
       active: false,
-      lastlocation: '570150',
+      newlocation: '',
+      lastlocation: '',
       fbID: fbID || false,
     });
 
