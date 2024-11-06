@@ -160,11 +160,19 @@ const RunnerBoard = () => {
     const handleInitialLocationSubmit = async () => {
         try {
             // Assuming you want to update the location on the server
-            const response = await axios.post('/api/user/initialLocation', {
-                username: decodedtoken.username,
-                location: initialLocation
-            });
             
+            
+            (async () => {
+                try {
+                    const response = await axios.post('/api/user/initialLocation', {
+                        username: decodedtoken.username,
+                        location: initialLocation
+                    });
+                    console.log('Poster successful');
+                } catch (error) {
+                    console.error('Error updating carpark availability:', error);
+                }
+            })();
             // Update state and hide the input form
             setLastLocation(initialLocation);
             setLocationInputVisible(false);
