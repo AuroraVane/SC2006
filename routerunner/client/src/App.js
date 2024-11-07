@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes,Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 
 // Importing components
@@ -27,7 +27,7 @@ const App = () => {
         <Routes>
           <Route element={<Layout />}>
             {/* Fully Accessible Routes */}
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="*" element={<NotFound />} />
 
