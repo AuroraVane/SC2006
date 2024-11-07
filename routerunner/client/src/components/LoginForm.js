@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { parseJwt } from '../utils/jwtUtils';
 import { doSignInWithEmailAndPassword } from '../firebase/auth'; // Import Firebase functions
 import { getAuth } from 'firebase/auth';
+import deliveryIcon from '../utils/delivery.jpg';
 
 const LoginForm = () => {
     const [username, setUsername] = useState('');
@@ -70,7 +71,9 @@ const LoginForm = () => {
 
     return (
         <div className="form-container">
-            <h2>Login</h2>
+            <h1>Login</h1>
+            <img src={deliveryIcon} alt="delivery_icon" />
+            <h3></h3>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Email: </label>
