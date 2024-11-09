@@ -406,3 +406,19 @@ th, td {
 .centered {
   text-align: center; /* Ensures centered alignment for specific cells */
 }
+.MJ-delete-button {
+  padding: 10px 20px;  /* Adjust padding for consistent size */
+  font-size: 14px;     /* Ensure consistent text size */
+  width: 150px;        /* Set a fixed width for both buttons */
+  text-align: center;  /* Center text horizontally */
+  border: none;        /* Optional: Remove border */
+  background-color: #f44336;  /* Example background color */
+  color: white;        /* Text color */
+  cursor: pointer;     /* Add cursor pointer */
+  border-radius: 4px;  /* Optional: Rounded corners */
+  transition: background-color 0.3s ease;
+}
+
+.MJ-delete-button:hover {
+  background-color: #d32f2f;  /* Example hover effect */
+}

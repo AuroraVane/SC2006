@@ -63,12 +63,17 @@ const ManageJobs = () => {
                   {job.status === 'ongoing' ? '🟢' : '🔴'} {/* Green circle for active, red for inactive */}
                 </td>
                 { job.status !== 'ongoing' && <button
-                  className="delete-button"
+                  className="MJ-delete-button"
                   onClick={() => handleDeleteJob(job.jobID)}
                 >
                 Delete
                 </button>
                 }
+                { job.status === 'ongoing' && <button
+                  classname="MJ-delete-button"
+                >
+                Unable to Delete
+                </button>}
               </tr>
             ))}
           </tbody>
