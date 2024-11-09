@@ -8,8 +8,11 @@ const ManageJobs = () => {
   const [jobs, setJobs] = useState([]);
 
   const handleDeleteJob = async (jobID) => {
-    await axios.post('/api/deleteJob', {jobID});
-    fetchAllJobs();
+    const confirmed = window.confirm("Are you sure you want to proceed?");
+    if (confirmed){
+      await axios.post('/api/deleteJob', {jobID});
+      fetchAllJobs();
+    }
   }
   const fetchAllJobs = async () => {
     try {
