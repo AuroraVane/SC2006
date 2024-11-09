@@ -668,21 +668,6 @@ app.get('/api/user/jobCompleted', async (req,res) => {
   }
 });
 
-app.post('/api/resetDB', async (req, res) => {
-  await Job.updateMany({}, {$set: {status:'waiting', runnerUsername:'null'}});
-  await Job.updateOne({
-    status:'waiting'
-  },{$set:{
-    runnerUsername:'abc',
-    status:'ongoing'
-  }})
-  await User.updateOne({
-    username: 'abc'
-  }, {$set:{
-    lastlocation:'238823',
-    newlocation:'639798'
-  }})
-})
 
 // Start the server
 app.listen(5001, () => {
