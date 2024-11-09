@@ -7,18 +7,21 @@ const ManageJobs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [jobs, setJobs] = useState([]);
 
-  useEffect(() => {
-    const fetchAllJobs = async () => {
-      try {
-        const response = await axios.get('/api/joblist'); // Ensure this endpoint returns all runners
-        setJobs(response.data); // Update runners with fetched data
-      } catch (error) {
-        console.error('Error fetching runners:', error);
-      }
-    };
-
+  const handleDeleteJob = async (jobID) => {
+    await axios.post('/api/deleteJob', {jobID});
     fetchAllJobs();
-  }, []);
+  }
+  const fetchAllJobs = async () => {
+    try {
+      const response = await axios.get('/api/joblist'); // Ensure this endpoint returns all runners
+      setJobs(response.data); // Update runners with fetched data
+    } catch (error) {
+      console.error('Error fetching runners:', error);
+    }
+  };
+  useEffect(() => {
+    fetchAllJobs();
+  }, [jobs]);
 
   return (
     <div className='manage-runner-container'>
@@ -56,6 +59,13 @@ const ManageJobs = () => {
                 <td>
                   {job.status === 'ongoing' ? '🟢' : '🔴'} {/* Green circle for active, red for inactive */}
                 </td>
+                { job.status !== 'ongoing' && <button
+                  className="delete-button"
+                  onClick={() => handleDeleteJob(job.jobID)}
+                >
+                Delete
+                </button>
+                }
               </tr>
             ))}
           </tbody>

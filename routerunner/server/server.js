@@ -584,6 +584,18 @@ app.post('/api/user/initialLocation', async (req, res) => {
   }
 })
 
+app.post('/api/deleteJob', async (req, res) => {
+  const {jobID} = req.body;
+  const job = await Job.findOne({jobID: jobID});
+  if (job.status === 'ongoing' || job.status === 'completed'){
+    res.status(403).json('Can only delete job waiting')
+  }
+  else{
+    tmp = await Job.findOneAndDelete({jobID: jobID});
+    tmp = await Address.findOneAndDelete({_id: job.address});
+    res.json('Success!')
+  }
+})
 
 app.get('/api/user/jobCompleted', async (req,res) => {
   const {username} = req.query;
