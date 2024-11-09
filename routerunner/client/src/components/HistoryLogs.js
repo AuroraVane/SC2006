@@ -75,7 +75,7 @@ const HistoryLogs = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/historylogs');
+        const response = await axios.get('/api/historylogs');
         setLogs(response.data);
       } catch (error) {
         console.error('Error fetching history logs:', error);
