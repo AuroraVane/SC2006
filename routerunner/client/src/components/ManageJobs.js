@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const ManageJobs = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -9,8 +11,8 @@ const ManageJobs = () => {
 
   const handleDeleteJob = async (jobID) => {
     const confirmed = window.confirm("Are you sure you want to proceed?");
-    if (confirmed){
-      await axios.post('/api/deleteJob', {jobID});
+    if (confirmed) {
+      await axios.post('/api/deleteJob', { jobID });
       fetchAllJobs();
     }
   }
@@ -44,6 +46,7 @@ const ManageJobs = () => {
               <th>Job ID</th>
               <th>Username</th>
               <th>Status</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -62,18 +65,33 @@ const ManageJobs = () => {
                 <td>
                   {job.status === 'ongoing' ? '🟢' : '🔴'} {/* Green circle for active, red for inactive */}
                 </td>
-                { job.status !== 'ongoing' && <button
-                  className="MJ-delete-button"
-                  onClick={() => handleDeleteJob(job.jobID)}
-                >
-                Delete
-                </button>
-                }
-                { job.status === 'ongoing' && <button
-                  classname="MJ-delete-button"
-                >
-                Unable to Delete
-                </button>}
+                <td>
+                  {job.status !== 'ongoing' && (
+                    <FontAwesomeIcon
+                      icon={faTrash}
+                      style={{
+                        color: 'red',
+                        cursor: 'pointer',
+                        borderRadius: '5px',
+                        padding: '10px'
+                      }}
+                      onClick={() => handleDeleteJob(job.jobID)}
+                    />
+                  )}
+
+                  {job.status === 'ongoing' && (
+                    <FontAwesomeIcon
+                      icon={faTrash}
+                      style={{
+                        color: 'grey',
+                        cursor: 'pointer',
+                        borderRadius: '5px',
+                        padding: '10px'
+                      }}
+                      onClick={() => handleDeleteJob(job.jobID)}
+                    />
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -81,12 +99,12 @@ const ManageJobs = () => {
       </div>
 
       {/* Buttons to CreateNewJob and HistoryLogs */}
-      <div className = "button-container">
+      <div className="button-container">
         <Link to="/createnewjob">
-          <button classname = "MJobs-button">Create Job</button>
+          <button classname="MJobs-button">Create Job</button>
         </Link>
         <Link to="/historylogs">
-          <button classname = "MJobs-button">History Log</button>
+          <button classname="MJobs-button">History Log</button>
         </Link>
       </div>
     </div>
