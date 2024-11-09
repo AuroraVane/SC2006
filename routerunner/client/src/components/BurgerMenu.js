@@ -15,7 +15,8 @@ const BurgerMenu = () => {
   const username = decodedtoken?.username;
   const [jobID, setJobID] = useState(null);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await axios.post('/api/logout', {username});
     localStorage.removeItem('token');
     navigate('/login'); // Redirect to login after logout
   };

@@ -149,11 +149,10 @@ app.post('/api/resetpassword', async (req, res) => {
 
 // POST: Login an existing user
 app.post('/api/login', async (req, res) => {
-  const { username, idtoken } = req.body;
-  console.log(username);
+  const { email, idtoken } = req.body;
   try {
     // Find the user by username
-    const user = await User.findOne({ email: username });
+    const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(400).json({ message: 'Invalid username' });
     }
@@ -165,12 +164,38 @@ app.post('/api/login', async (req, res) => {
       { expiresIn: '1h' } // Token expiration (1 hour in this case)
     );
 
+    // Update status
+    if (user.usertype === 'runner'){
+      const tmp = await User.updateOne({
+        username: user.username,
+      }, {$set:{
+        active: true
+      }})
+    }
+
     // Send the token back to the client
     res.json({ token, message: 'Login successful' });
   } catch (error) {
     res.status(500).send('Error logging in');
   }
 });
+
+app.post('/api/logout', async (req, res) => {
+  const {username} = req.body;
+  try{
+    const user = await User.findOne({ username: username });
+    if (user.usertype === 'runner'){
+      const tmp = await User.updateOne({
+        username: user.username,
+      }, {$set:{
+        active: false
+      }})
+    };
+    res.json('Successful');
+  } catch(error){
+    res.status(500, {message: 'Unable to logout: ', error})
+  }
+})
 
 // GET all users (for testing purposes)
 app.get('/api/users', authenticateJWT, async (req, res) => {

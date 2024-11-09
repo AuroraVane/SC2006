@@ -8,7 +8,7 @@ import { getAuth } from 'firebase/auth';
 import deliveryIcon from '../utils/delivery.jpg';
 
 const LoginForm = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isSigningIn, setIsSigningIn] = useState(false);
@@ -21,7 +21,7 @@ const LoginForm = () => {
 
         try {
             // Use Firebase to authenticate the user
-            const userCredential = await doSignInWithEmailAndPassword(username, password);
+            const userCredential = await doSignInWithEmailAndPassword(email, password);
             const user = userCredential.user;
             
             if(!user.emailVerified){
@@ -34,7 +34,7 @@ const LoginForm = () => {
             const idToken = await user.getIdToken();
             // Send the Firebase ID token to your backend to create a JWT
             const response = await axios.post('http://localhost:5001/api/login', {
-                username,
+                email,
                 idToken, // Send the Firebase token to backend
             });
 
@@ -52,9 +52,9 @@ const LoginForm = () => {
                 
                 // Redirect based on user type
                 if (userType === 'operator'){
-                    navigate(`/omm/${username}`);
+                    navigate(`/omm/${email}`);
                 } else if (userType === 'runner'){
-                    navigate(`/rmm/${username}`);
+                    navigate(`/rmm/${email}`);
                 }
             }
         } catch (error) {
@@ -79,8 +79,8 @@ const LoginForm = () => {
                     <label>Email: </label>
                     <input
                         type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                 </div>
