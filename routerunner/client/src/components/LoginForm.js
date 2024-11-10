@@ -1,11 +1,9 @@
-// components/LoginForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { parseJwt } from '../utils/jwtUtils';
 import { doSignInWithEmailAndPassword } from '../firebase/auth'; // Import Firebase functions
 import { getAuth } from 'firebase/auth';
-import deliveryIcon from '../utils/delivery.jpg';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -14,6 +12,15 @@ const LoginForm = () => {
     const [isSigningIn, setIsSigningIn] = useState(false);
     const navigate = useNavigate();
     const auth = getAuth();
+
+    useEffect(() => {
+        // Add 'login-page' class to body on mount and remove it on unmount
+        document.body.classList.add('login-page');
+
+        return () => {
+            document.body.classList.remove('login-page');
+        };
+    }, []); // Empty array ensures it runs only on mount and unmount
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -72,7 +79,6 @@ const LoginForm = () => {
     return (
         <div className="form-container">
             <h1>Login</h1>
-            <img src={deliveryIcon} alt="delivery_icon" />
             <h3></h3>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
