@@ -88,7 +88,6 @@ const ManageJobs = () => {
                         borderRadius: '5px',
                         padding: '10px'
                       }}
-                      onClick={() => handleDeleteJob(job.jobID)}
                     />
                   )}
                 </td>

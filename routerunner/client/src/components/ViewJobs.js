@@ -1,7 +1,7 @@
 // components/ViewJobs.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { parseJwt } from '../utils/jwtUtils';
 
 const ViewJobs = () => {
@@ -10,6 +10,15 @@ const ViewJobs = () => {
   const token = localStorage.getItem('token');
   const decodedtoken = token ? parseJwt(token) : null;
   const usertype = decodedtoken ? decodedtoken.usertype : null;
+  const navigate = useNavigate();
+
+  const handleDeleteJob = async (jobID) => {
+    const confirmed = window.confirm("Are you sure you want to proceed?");
+    if (confirmed) {
+      await axios.post('/api/deleteJob', { jobID });
+      navigate('/mngjob');
+    }
+  }
 
   useEffect(() => {
     const fetchJobData = async () => {
@@ -43,22 +52,18 @@ const ViewJobs = () => {
           <strong>Priority:</strong> {jobData.priority ? 'High' : 'Low'}
         </p>
       </div>
-
-      {usertype === "operator" && (
+      {((usertype === "operator") && (jobData.status === 'waiting')) &&(
         <button
-          type="button"
           style={{
             marginTop: '20px',
             padding: '10px 15px',
-            backgroundColor: jobData.status === 'waiting' ? '#f44336' : '#cccccc',
+            backgroundColor: '#f44336',
             color: 'white',
             border: 'none',
             borderRadius: '5px',
-            cursor: jobData.status === 'waiting' ? 'pointer' : 'not-allowed',
-            opacity: jobData.status === 'waiting' ? '1' : '0.6'
+            cursor: 'pointer'
           }}
-          onClick={() => jobData.status === 'waiting' && alert("Delete functionality placeholder")}
-          disabled={jobData.status !== 'waiting'}
+          onClick={() => handleDeleteJob(jobID)}
         >
           Delete Job
         </button>
