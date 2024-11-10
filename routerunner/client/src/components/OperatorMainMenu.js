@@ -173,7 +173,7 @@ const OperatorMainMenu = () => {
                 fontSize: '16px',             
                 color: '#333', 
             }}>
-              {runner.username}: {runnerLocationsAddress[index]?.lastlocation || 'Loading...'}
+              {runner.username}: {runnerLocationsAddress[index]?.lastlocation || 'Waiting for job...'}
             </button>
           ))}
         </ul>
