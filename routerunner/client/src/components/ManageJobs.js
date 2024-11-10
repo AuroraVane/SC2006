@@ -36,7 +36,7 @@ const ManageJobs = () => {
       
       <input
         type="text"
-        placeholder="Search for job (by username)"
+        placeholder="Search for Job (by Username)"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="search-input"
@@ -74,16 +74,16 @@ const ManageJobs = () => {
               textAlign: 'center',
               transition: 'transform 0.2s'
             }}>
-              <Link to={`/viewjobs/${job.jobID}`} style={{ textDecoration: 'none', color: '#007bff', fontSize: '14px' }}>
+              <Link to={`/viewjobs/${job.jobID}`} style={{ textDecoration: 'none', color: '#0a0a0a', fontSize: '14px' }}>
                 {job.jobID}
               </Link>
-              <p style={{ margin: '0', fontSize: '14px', color: '#555' }}>{job.runnerUsername}</p>
+              <p style={{ margin: '0', fontSize: '14px', color: '#0a0a0a' }}>{job.runnerUsername}</p>
               <span style={{ fontSize: '14px', color: job.status === 'ongoing' ? 'green' : 'red' }}>
                 {job.status === 'ongoing' ? 'Ongoing' : 'Pending'}
               </span>
               <FontAwesomeIcon
                 icon={faTrash}
-                style={{ color: job.status !== 'ongoing' ? 'red' : 'grey', cursor: job.status !== 'ongoing' ? 'pointer' : 'not-allowed', fontSize: '1.2em' }}
+                style={{ color: job.status !== 'ongoing' ? 'blue' : 'grey', cursor: job.status !== 'ongoing' ? 'pointer' : 'not-allowed', fontSize: '1.2em' }}
                 title={job.status !== 'ongoing' ? "Delete Job" : "Cannot delete ongoing job"}
                 onClick={() => job.status !== 'ongoing' && handleDeleteJob(job.jobID)}
               />
