@@ -16,7 +16,7 @@ import RunnerMainMenu from './components/RunnerMainMenu';
 import ViewCarparkAvailability from './components/ViewCarparkAvailability';
 import ViewJobs from './components/ViewJobs';
 
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './utils/ProtectedRoute';
 
 const App = () => {
   return (

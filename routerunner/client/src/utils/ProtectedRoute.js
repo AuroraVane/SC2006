@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { parseJwt } from '../utils/jwtUtils'; // Import the utility function
+import { parseJwt } from './jwtUtils'; // Import the utility function
 
 const ProtectedRoute = ({ element: Component, allowedUsertype, ...rest }) => {
     // Retrieve token from localStorage
