@@ -3,10 +3,8 @@ import { BrowserRouter as Router, Route, Routes,Navigate } from 'react-router-do
 import Layout from './components/Layout';
 
 // Importing components
-import HomePage from './components/HomePage';
 import LoginForm from './components/LoginForm';
 import NotFound from './components/NotFound';
-import ViewJobDetails from './components/ViewJobDetails';
 import OperatorMainMenu from './components/OperatorMainMenu';
 import ManageJobs from './components/ManageJobs';
 import ManageRunner from './components/ManageRunners';
@@ -30,9 +28,6 @@ const App = () => {
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="*" element={<NotFound />} />
-
-            {/* General Routes */}
-            <Route path="/viewjobdetails/:jobID" element={<ViewJobDetails />} />
 
             {/* Operator Routes */}
             <Route path="/omm/:userID" element={<ProtectedRoute element={OperatorMainMenu} allowedUsertype="operator" />} />

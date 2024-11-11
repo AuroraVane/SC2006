@@ -1,11 +1,13 @@
 // components/ViewRunner.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { deleteUser, sendPasswordResetEmail,getAuth } from 'firebase/auth';
+import GoogleMapComponent from './GoogleMap';
 
 const ViewRunner = () => {
+  const mapRef = useRef(null);
   const navigate = useNavigate();
   const { runnerId } = useParams(); // Get runnerId from the URL
   const [runnerData, setRunnerData] = useState(null);
@@ -121,6 +123,20 @@ const ViewRunner = () => {
   }
 
   return (
+    <div>
+      <GoogleMapComponent mapRef={mapRef} />
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "white",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+          maxWidth: "500px"
+        }}
+      >
     <div className="view-runner-container">
       <h1>Runner Details: {runnerData.username}</h1>
       <p>Last Location: {runnerData.lastLocation}</p>
@@ -137,6 +153,8 @@ const ViewRunner = () => {
       <Link to="/mngrnr">
         <button className="back-button">Back to Manage Runners</button>
       </Link>
+    </div>
+    </div>
     </div>
   );
 };

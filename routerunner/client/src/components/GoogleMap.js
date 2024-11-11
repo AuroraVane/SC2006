@@ -28,7 +28,7 @@ const GoogleMapComponent = ({ mapRef }) => {
           center={defaultCenter}
           options={{
             mapTypeControl: false,
-            zoomControl: true,
+            zoomControl: false,
             fullscreenControl: false,
             streetViewControl: false,
           }}
