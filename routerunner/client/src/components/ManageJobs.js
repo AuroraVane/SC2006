@@ -17,15 +17,17 @@ const ManageJobs = () => {
       await axios.post('/api/deleteJob', { jobID });
       fetchAllJobs();
     }
-  }
+  };
+
   const fetchAllJobs = async () => {
     try {
-      const response = await axios.get('/api/joblist'); // Ensure this endpoint returns all runners
-      setJobs(response.data); // Update runners with fetched data
+      const response = await axios.get('/api/joblist');
+      setJobs(response.data);
     } catch (error) {
-      console.error('Error fetching runners:', error);
+      console.error('Error fetching jobs:', error);
     }
   };
+
   useEffect(() => {
     fetchAllJobs();
   }, [jobs]);

@@ -422,3 +422,36 @@ th, td {
 .MJ-delete-button:hover {
   background-color: #d32f2f;  /* Example hover effect */
 }
+/* login.css */
+
+body.login-page {
+  position: relative;
+  margin: 0;
+  height: 100vh;
+}
+
+body.login-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('./utils/sgroad.jpg'); 
+  background-size: cover;
+  background-position: center;
+  filter: blur(5px); /* Adjust blur strength */
+  z-index: -1; /* Makes sure the background is behind the content */
+}
+
+.login-container {
+  background-color: white; 
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px; 
+  margin: auto; /* Centers the form container horizontally */
+  position: relative;
+  z-index: 1; /* Ensures the form is above the blurred background */
+}
