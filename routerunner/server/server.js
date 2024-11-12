@@ -236,6 +236,15 @@ app.delete('/api/runners/deleteuser', async (req, res) => {
     console.error('Error deleting runner:', error);
     res.status(500).json({ message: 'Error deleting runner' });
   }
+  try {
+    const job = await Job.findOne({runnerUsername: username, status: 'ongoing'});
+    if (job !== null){
+      const jobupdate = await Job.updateOne({ runnerUsername: username, status: 'ongoing' }, { $set: { status: 'waiting', runnerUsername: "null" } });
+    }
+  } catch (error) {
+    console.error('Error deleting job:', error);
+    res.status(500).json({ message: 'Error deleting job' });
+  }
 });
 
 app.get('/api/user/email', async (req, res) => {
