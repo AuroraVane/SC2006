@@ -1,5 +1,5 @@
 // components/ManageJobs.js
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -57,63 +57,71 @@ const ManageJobs = () => {
             className="search-input"
           />
 
-          <div className="job-list-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Job ID</th>
-                  <th>Username</th>
-                  <th>Status</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobs.map((job) => (
-                  <tr key={job._id} className="job-item">
-                    <td>
-                      <Link to={`/viewjobs/${job.jobID}`} className="job-link">
-                        {job.jobID}
-                      </Link>
-                    </td>
-                    <td>
-                      <Link to={`/viewjobs/${job.jobID}`} className="job-link">
-                        {job.runnerUsername}
-                      </Link>
-                    </td>
-                    <td>
-                      {job.status === 'ongoing' ? '🟢' : '🔴'} {/* Green circle for active, red for inactive */}
-                    </td>
-                    <td>
-                      {job.status !== 'ongoing' && (
-                        <FontAwesomeIcon
-                          icon={faTrash}
-                          style={{
-                            color: 'red',
-                            cursor: 'pointer',
-                            borderRadius: '5px',
-                            padding: '10px'
-                          }}
-                          onClick={() => handleDeleteJob(job.jobID)}
-                        />
-                      )}
+<div
+  className="job-list-container"
+  style={{
+    height: "300px",        // Set a fixed height
+    overflowY: "auto",       // Enable vertical scroll when content overflows
+    overflowX: "hidden",     // Prevent horizontal scrolling if not needed
+    display: "block"         // Ensure it's a block element for proper scrolling
+  }}
+>
+  <table style={{ width: "100%", borderCollapse: "collapse" }}>  {/* Ensures the table fits within the container */}
+    <thead>
+      <tr>
+        <th>Job ID</th>
+        <th>Username</th>
+        <th>Status</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {jobs.map((job) => (
+        <tr key={job._id} className="job-item">
+          <td>
+            <Link to={`/viewjobs/${job.jobID}`} className="job-link">
+              {job.jobID}
+            </Link>
+          </td>
+          <td>
+            <Link to={`/viewjobs/${job.jobID}`} className="job-link">
+              {job.runnerUsername}
+            </Link>
+          </td>
+          <td>
+            {job.status === 'ongoing' ? '🟢' : '🔴'}
+          </td>
+          <td>
+            {job.status !== 'ongoing' && (
+              <FontAwesomeIcon
+                icon={faTrash}
+                style={{
+                  color: 'red',
+                  cursor: 'pointer',
+                  borderRadius: '5px',
+                  padding: '10px'
+                }}
+                onClick={() => handleDeleteJob(job.jobID)}
+              />
+            )}
 
-                      {job.status === 'ongoing' && (
-                        <FontAwesomeIcon
-                          icon={faTrash}
-                          style={{
-                            color: 'grey',
-                            cursor: 'pointer',
-                            borderRadius: '5px',
-                            padding: '10px'
-                          }}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            {job.status === 'ongoing' && (
+              <FontAwesomeIcon
+                icon={faTrash}
+                style={{
+                  color: 'grey',
+                  cursor: 'pointer',
+                  borderRadius: '5px',
+                  padding: '10px'
+                }}
+              />
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
 
           {/* Buttons to CreateNewJob and HistoryLogs */}
           <div className="button-container">
