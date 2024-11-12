@@ -50,12 +50,20 @@ const ManageJobs = () => {
         <div className='manage-runner-container'>
           <h1>Manage Jobs</h1>
           <input
-            type="text"
-            placeholder="Search for job"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+        type="text"
+        placeholder="Search for Job (by Username)"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="search-input"
+        style={{
+          width: '100%',
+          padding: '10px',
+          marginBottom: '20px',
+          border: '1px solid #ccc',
+          borderRadius: '8px',
+          boxSizing: 'border-box'
+        }}
+      />
 
 <div
   className="job-list-container"
@@ -66,61 +74,46 @@ const ManageJobs = () => {
     display: "block"         // Ensure it's a block element for proper scrolling
   }}
 >
-  <table style={{ width: "100%", borderCollapse: "collapse" }}>  {/* Ensures the table fits within the container */}
-    <thead>
-      <tr>
-        <th>Job ID</th>
-        <th>Username</th>
-        <th>Status</th>
-        <th>Delete</th>
-      </tr>
-    </thead>
-    <tbody>
-      {jobs.map((job) => (
-        <tr key={job._id} className="job-item">
-          <td>
-            <Link to={`/viewjobs/${job.jobID}`} className="job-link">
-              {job.jobID}
-            </Link>
-          </td>
-          <td>
-            <Link to={`/viewjobs/${job.jobID}`} className="job-link">
-              {job.runnerUsername}
-            </Link>
-          </td>
-          <td>
-            {job.status === 'ongoing' ? '🟢' : '🔴'}
-          </td>
-          <td>
-            {job.status !== 'ongoing' && (
-              <FontAwesomeIcon
-                icon={faTrash}
-                style={{
-                  color: 'red',
-                  cursor: 'pointer',
-                  borderRadius: '5px',
-                  padding: '10px'
-                }}
-                onClick={() => handleDeleteJob(job.jobID)}
-              />
-            )}
+  {/* Labels aligned above each card field */}
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', padding: '10px 0', fontWeight: 'bold', color: '#555', textAlign: 'center' }}>
+        <span>Job ID</span>
+        <span>Username</span>
+        <span>Status</span>
+        <span></span> {/* Empty column for delete icon */}
+      </div>
 
-            {job.status === 'ongoing' && (
+      <div className="job-cards-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '10px' }}>
+        {jobs
+          .filter(job => job.runnerUsername.toLowerCase().includes(searchTerm.toLowerCase()))
+          .map((job) => (
+            <div key={job._id} className="job-card" style={{
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              padding: '15px',
+              backgroundColor: '#fff',
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr auto',
+              alignItems: 'center',
+              textAlign: 'center',
+              transition: 'transform 0.2s'
+            }}>
+              <Link to={`/viewjobs/${job.jobID}`} style={{ textDecoration: 'none', color: '#0a0a0a', fontSize: '14px' }}>
+                {job.jobID}
+              </Link>
+              <p style={{ margin: '0', fontSize: '14px', color: '#0a0a0a' }}>{job.runnerUsername}</p>
+              <span style={{ fontSize: '14px', color: job.status === 'ongoing' ? 'green' : 'red' }}>
+                {job.status === 'ongoing' ? 'Ongoing' : 'Pending'}
+              </span>
               <FontAwesomeIcon
                 icon={faTrash}
-                style={{
-                  color: 'grey',
-                  cursor: 'pointer',
-                  borderRadius: '5px',
-                  padding: '10px'
-                }}
+                style={{ color: job.status !== 'ongoing' ? 'blue' : 'grey', cursor: job.status !== 'ongoing' ? 'pointer' : 'not-allowed', fontSize: '1.2em' }}
+                title={job.status !== 'ongoing' ? "Delete Job" : "Cannot delete ongoing job"}
+                onClick={() => job.status !== 'ongoing' && handleDeleteJob(job.jobID)}
               />
-            )}
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
+            </div>
+          ))}
+      </div>
 </div>
 
           {/* Buttons to CreateNewJob and HistoryLogs */}
