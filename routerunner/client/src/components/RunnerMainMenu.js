@@ -82,6 +82,7 @@ const RunnerBoard = () => {
             const response = await geocoder.geocode({ address: postalCode });
             if (response.results[0]) {
                 const location = response.results[0].geometry.location;
+                console.log(location)
                 return {
                     lat: location.lat(),
                     lng: location.lng(),
@@ -134,9 +135,12 @@ const RunnerBoard = () => {
 
     const handleCompletedJob = async () => {
         try {
+            const lastLoc = await geocodePostalCode(lastlocation);
             const response = await axios.get('/api/user/jobCompleted', {
                 params: {
                     username: decodedtoken.username,
+                    lat: lastLoc.lat,
+                    long: lastLoc.lng,
                 }
             });
             if(response.data.postalCode === ''){

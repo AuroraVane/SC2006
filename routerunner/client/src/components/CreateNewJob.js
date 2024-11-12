@@ -10,6 +10,8 @@ const CreateNewJob = () => {
   const [unitNumber, setUnitNumber] = useState('');
   const [note, setNote] = useState('');
   const [priority, setPriority] = useState(false);
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
@@ -31,6 +33,8 @@ const CreateNewJob = () => {
         const blockComponent = results[0]["BLK_NO"];
         setStreetName(streetComponent || 'N/A');
         setBlockNumber(blockComponent || 'N/A');
+        setLatitude(results[0]['LATITUDE']);
+        setLongitude(results[0]['LONGITUDE']);
         setError(null);
       } else {
         setStreetName('N/A');
@@ -56,6 +60,8 @@ const CreateNewJob = () => {
       priority: priority,
       runnerID: null,
       status: 'waiting',
+      latitude: latitude,
+      longitude: longitude,
     };
 
     try {

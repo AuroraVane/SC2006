@@ -485,7 +485,7 @@ app.get('/api/get-runner-job', async (req, res) => {
 // ==================== JOB CREATION ENDPOINT ====================
 app.post('/api/jobs', async (req, res) => {
   console.log("Entered backend")
-  const { jobID, address, runner, note, priority, status } = req.body;
+  const { jobID, address, runner, note, priority, status, latitude, longitude} = req.body;
 
   // Validate required fields
   if (!jobID || !address) {
@@ -509,6 +509,10 @@ app.post('/api/jobs', async (req, res) => {
           note: note || null,
           runner: runner || null,
           status: status,
+          location: {
+            type: 'Point',
+            coordinates: [longitude, latitude]
+          }
     });
 
     await newJob.save();
@@ -598,7 +602,9 @@ app.post('/api/deleteJob', async (req, res) => {
 })
 
 app.get('/api/user/jobCompleted', async (req,res) => {
-  const {username} = req.query;
+  const {username, lat, long} = req.query;
+  console.log(lat)
+  console.log(long)
   try {
     const jobcompleted = await Job.findOne({status:'ongoing', runnerUsername:username});
     if (jobcompleted !== null){
@@ -624,7 +630,7 @@ app.get('/api/user/jobCompleted', async (req,res) => {
       await newlog.save();
       // update user
       const addresscompleted = await Address.findOne({_id: jobcompleted.address});
-      user = await User.updateOne({
+      let user = await User.updateOne({
         username: username,
       }, {$set:{
         lastlocation: addresscompleted.postalCode,
@@ -635,16 +641,32 @@ app.get('/api/user/jobCompleted', async (req,res) => {
     // search for job
     // prioritise 
     jobongoingupdate = await Job.updateOne({
-      status: 'waiting',
+      location:{
+        $near:{
+          $geometry:{
+            type:'Point',
+            coordinates: [long, lat]
+          }
+        }
+      },
       priority: true,
+      status: 'waiting',
     }, {$set:{
       runnerUsername: username,
       status: 'ongoing'
     }})
     if (jobongoingupdate.modifiedCount == 0){
       jobongoingupdate = await Job.updateOne({
-        status: 'waiting',
+        location:{
+          $near:{
+            $geometry:{
+              type:'Point',
+              coordinates: [long, lat]
+            }
+          }
+        },
         priority: false,
+        status: 'waiting',
       }, {$set:{
         runnerUsername: username,
         status: 'ongoing'

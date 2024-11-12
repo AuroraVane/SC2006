@@ -22,6 +22,11 @@ const jobSchema = new mongoose.Schema({
         enum: ['waiting', 'ongoing', 'completed'], 
         required: false 
     },
+    location: {
+        type: { type: String, enum: ['Point'], required: true },
+        coordinates: { type: [Number], required: true },
+    },
 });
 
+jobSchema.index({ location: '2dsphere' });
 module.exports = mongoose.model('Job', jobSchema);
