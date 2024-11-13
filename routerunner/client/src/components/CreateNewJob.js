@@ -17,6 +17,10 @@ const CreateNewJob = () => {
 
   const checkPostalCodeExists = async (e) => {
     e.preventDefault();
+    if(postalcode.length !== 6) {
+      setError('Postal code must be 6 digits');
+      return;
+    }
     try {
       const response = await axios.get("https://www.onemap.gov.sg/api/common/elastic/search", {
         params: {
