@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import GoogleMapComponent from './GoogleMap';
 import { parseJwt } from '../utils/jwtUtils';
 import axios from 'axios';
@@ -10,6 +11,7 @@ const RunnerBoard = () => {
     const directionsRendererRef = useRef(null); // For route rendering
     const token = localStorage.getItem('token');
     const decodedtoken = token ? parseJwt(token) : null;
+    const username = decodedtoken.username;
     const [lastlocation, setLastLocation] = useState('');
     const [newlocation, setNewLocation] = useState('');
     const [newLocationLat, setNewLocationLat] = useState('');
@@ -22,6 +24,7 @@ const RunnerBoard = () => {
     const [carparkAdd, setCarparkAdd] = useState('');
     const [locationInputVisible, setLocationInputVisible] = useState(false); // For conditional rendering
     const [initialLocation, setInitialUserLocation] = useState('');  // To store user's new location input
+    const [jobID, setJobID] = useState(null);
 
     // Function to handle carpark button click
     const handleCarparkClick = () => {
@@ -143,15 +146,15 @@ const RunnerBoard = () => {
                     long: lastLoc.lng,
                 }
             });
-            if(response.data.postalCode === ''){
+            if (response.data.postalCode === '') {
                 alert("No new jobs available")
                 setNewLocation(String(''))
             }
             else {
-                if (newlocation !== ''){
+                if (newlocation !== '') {
                     // for repeated no new jobs
                     setLastLocation(newlocation);
-                } else{
+                } else {
                     setLastLocation(newlocation);
                     setNewLocation(String(response.data.postalCode));
                 }
@@ -164,8 +167,8 @@ const RunnerBoard = () => {
     const handleInitialLocationSubmit = async () => {
         try {
             // Assuming you want to update the location on the server
-            
-            
+
+
             (async () => {
                 try {
                     const response = await axios.post('/api/user/initialLocation', {
@@ -191,7 +194,7 @@ const RunnerBoard = () => {
                 const response = await axios.get('/api/user/location', { params: { username: decodedtoken.username } });
                 setLastLocation(response.data.lastlocation); // This will trigger re-render
                 setNewLocation(response.data.newlocation); // This will trigger re-render
-                if (response.data.lastlocation === ''){
+                if (response.data.lastlocation === '') {
                     setLocationInputVisible(true);
                 } else {
                     setLocationInputVisible(false);
@@ -226,66 +229,81 @@ const RunnerBoard = () => {
         handleRouting(); // Call the routing logic after locations are available
     }, [lastlocation, newlocation]); // Trigger when lastlocation or newlocation changes
 
+    useEffect(() => {
+        console.log("Fetching jobID for user:", username);
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get('/api/get-runner-job', { params: { username } });
+                console.log("API Response:", response.data);
+                setJobID(response.data.jobID);
+            } catch (error) {
+                console.error('Error fetching user:', error);
+            }
+        };
+        if (username) {
+            fetchUser();
+        }
+    }, [username, newlocation]);
     return (
         <div>
             <GoogleMapComponent mapRef={mapRef} />
             <div style={{
-            position: 'absolute',
-            bottom: '90px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '200px',
-            backgroundColor: '#fff',
-            borderRadius: '12px',
-            boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-            padding: '10px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+                position: 'absolute',
+                bottom: '90px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '200px',
+                backgroundColor: '#fff',
+                borderRadius: '12px',
+                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+                padding: '10px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-between',
             }}>
-            {locationInputVisible && (
-                <div className="location-input">
-                <h3>Enter your current location:</h3>
-                <input
-                    type="text"
-                    value={initialLocation}
-                    onChange={(e) => setInitialUserLocation(e.target.value)}
-                    placeholder="Enter your location"
-                />
-                <button onClick={handleInitialLocationSubmit}>Submit</button>
-                </div>
-            )}
-            
-            {!locationInputVisible && (
-                <div>
-                <button
-                    onClick={handleCompletedJob}
-                    style={{
-                    fontSize: '24px',
-                    background: '#f0f0f0', // Light grey background
-                    border: '2px solid #ccc', // Visible border
-                    borderRadius: '8px', // Smaller border radius for rectangular button
-                    padding: '10px 20px', // Adjust padding for rectangular shape
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 10,
-                    width: '100%', // Full width button
-                    }}>
-                    <span style={{
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    color: '#333'
-                    }}>
-                    {((newlocation === null) || (newlocation ==='')) ? 'Find new job' : 'Completed Job'}
-                    </span>
-                </button>
-                </div>
-            )}
+                {locationInputVisible && (
+                    <div className="location-input">
+                        <h3>Enter your current location:</h3>
+                        <input
+                            type="text"
+                            value={initialLocation}
+                            onChange={(e) => setInitialUserLocation(e.target.value)}
+                            placeholder="Enter your location"
+                        />
+                        <button onClick={handleInitialLocationSubmit}>Submit</button>
+                    </div>
+                )}
+
+                {!locationInputVisible && (
+                    <div>
+                        <button
+                            onClick={handleCompletedJob}
+                            style={{
+                                fontSize: '24px',
+                                background: '#f0f0f0', // Light grey background
+                                border: '2px solid #ccc', // Visible border
+                                borderRadius: '8px', // Smaller border radius for rectangular button
+                                padding: '10px 20px', // Adjust padding for rectangular shape
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 10,
+                                width: '100%', // Full width button
+                            }}>
+                            <span style={{
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                                color: '#333'
+                            }}>
+                                {((newlocation === null) || (newlocation === '')) ? 'Find new job' : 'Completed Job'}
+                            </span>
+                        </button>
+                    </div>
+                )}
             </div>
-                
+
 
             <div style={{
                 position: 'absolute',
@@ -301,13 +319,31 @@ const RunnerBoard = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
             }}>
-                <span style={{
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    color: '#333'
-                }}>
-                    View Carpark
-                </span>
+
+                <button
+                    style={{ background: '#f0f0f0', color: '#333', fontWeight: 'bold' }}
+                    disabled={!jobID} // Disable the button if jobID is null or undefined
+                >
+                    {jobID ? (
+                        <Link
+                            to={`/viewjobs/${jobID}`}
+                            style={{
+                                background: '#f0f0f0',
+                                textDecoration: 'none',
+                                color: '#333',
+                                fontSize: '14px',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            View Job
+                        </Link>
+                    ) : (
+                        <span style={{ color: '#aaa', fontSize: '14px', fontWeight: 'bold' }}>View Job</span>
+                    )}
+                </button>
+
+
+
                 <button
                     onClick={handleCarparkClick}
                     style={{
@@ -327,7 +363,7 @@ const RunnerBoard = () => {
                 </button>
             </div>
 
-            
+
             {/* Modal for carpark availability */}
             {showCarpark && (
                 <div style={{
@@ -373,7 +409,7 @@ const RunnerBoard = () => {
                             <p>Carpark Address: {carparkAdd}</p>
                             <p>Carpark Number: {selectedCarpark.carpark_number}</p>
                             <p>Last Updated: {selectedCarpark.update_datetime}</p>
-                            <p>Total Capacity: {selectedCarpark.carpark_info?.[0]?.total_lots || 'N/A'}</p> 
+                            <p>Total Capacity: {selectedCarpark.carpark_info?.[0]?.total_lots || 'N/A'}</p>
                             <p>Current Capacity: {selectedCarpark.carpark_info?.[0]?.lots_available || 'N/A'}</p>
                         </div>
                     ) : foundCarparkNumber && (
