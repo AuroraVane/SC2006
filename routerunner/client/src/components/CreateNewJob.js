@@ -17,7 +17,7 @@ const CreateNewJob = () => {
 
   const checkPostalCodeExists = async (e) => {
     e.preventDefault();
-    if(postalcode.length !== 6) {
+    if(postalCode.length !== 6) {
       setError('Postal code must be 6 digits');
       return;
     }
